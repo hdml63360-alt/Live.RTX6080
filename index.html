@@ -306,11 +306,11 @@
 <script>
   const $ = id => document.getElementById(id);
   
-  // --- تنظیمات اتصال به Render (آدرس سرور شما) ---
+  // --- تنظیمات اتصال به Render ---
   const RENDER_URL = 'wss://arisa-live.onrender.com'; 
   const ROOM_ID = 'arisa-main-room';
 
-  // --- توابع عمومی (Global) ---
+  // --- توابع عمومی ---
   window.changeTheme = (themeClass) => {
     document.body.className = ''; 
     if (themeClass !== 'theme-light') document.body.classList.add(themeClass);
@@ -393,7 +393,6 @@
     addAttendeeCard('me', attendees['me']);
     renderAttendees();
 
-    // اتصال به Render
     connectToRender();
   });
 
@@ -402,25 +401,26 @@
     
     ws.onopen = () => {
       $('statusDot').classList.add('online'); $('statusText').textContent = 'متصل';
+      
       ws.send(JSON.stringify({ type: 'join', room: ROOM_ID, userId: myId }));
       
-      // مکانیزم Ping برای بیدار نگه داشتن Render
+      // معرفی خود به همه
+      setTimeout(() => {
+         sendSignalData({ type: 'presence', name: myName, role: isTeacher ? 'teacher' : 'student', hand: handRaised });
+      }, 500);
+
       if(keepAliveTimer) clearInterval(keepAliveTimer);
       keepAliveTimer = setInterval(() => {
-        if (ws && ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify({ type: 'ping' }));
-        }
-      }, 5 * 60 * 1000); // هر 5 دقیقه
+        if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'ping' }));
+      }, 5 * 60 * 1000); 
     };
 
     ws.onmessage = (event) => {
       let msg;
       try { msg = JSON.parse(event.data); } catch { return; }
       
-      if (msg.type === 'pong') return; // پاسخ به ping
-      
-      // پیام‌های دریافتی از دیگران
-      if (msg.senderId === myId) return; // پیام خودمان را نادیده بگیر
+      if (msg.type === 'pong') return; 
+      if (msg.senderId === myId) return; 
 
       handleIncomingMessage(msg);
     };
@@ -431,7 +431,6 @@
     };
   }
 
-  // ارسال پیام از طریق Render
   function sendSignalData(data, targetId = null) {
     if (!ws || ws.readyState !== WebSocket.OPEN) return;
     data.senderId = myId;
@@ -439,11 +438,8 @@
     ws.send(JSON.stringify(data));
   }
 
-  // پردازش پیام‌های دریافتی
   function handleIncomingMessage(msg) {
-    // فیلتر کردن پیام‌های هدفمند
     if (msg.targetId && msg.targetId !== myId) return;
-    // اگر پیام هدفمند است، از طرف فرستنده دریافت شده
     const senderId = msg.senderId;
 
     switch(msg.type) {
@@ -452,9 +448,16 @@
           attendees[senderId] = { name: msg.name, role: msg.role, hand: msg.hand };
           addAttendeeCard(senderId, attendees[senderId]);
           renderAttendees();
+          
+          // اگر ما استاد هستیم، بلافاصله استریم را برای او می‌فرستیم
+          if (isTeacher && (localStream || screenStream)) {
+              createOffer(senderId);
+          }
+          // اگر لایو فعال داریم، به او اطلاع می‌دهیم
+          if (activeLive && isTeacher) {
+             sendSignalData({ type: 'live', liveType: 'start', ...activeLive }, senderId);
+          }
         }
-        // پاسخ به حضور برای اینکه طرف مقابل هم ما را بشناسد
-        sendSignalData({ type: 'presence', name: myName, role: isTeacher ? 'teacher' : 'student', hand: handRaised }, senderId);
         break;
       
       case 'chat':
