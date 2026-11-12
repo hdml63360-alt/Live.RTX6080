@@ -21,30 +21,12 @@
         
         .app-container { width: 100%; max-width: 450px; height: 100%; background: var(--bg-main); display: flex; flex-direction: column; position: relative; overflow: hidden; }
 
-        /* Auth Screens */
-        .auth-screen { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 30px; background: var(--bg-main); z-index: 100; }
-        .auth-logo { text-align: center; font-size: 32px; font-weight: 800; color: var(--kakao-dark); margin-bottom: 30px; }
-        .auth-input { width: 100%; padding: 15px; margin-bottom: 12px; border: 1px solid var(--border-color); border-radius: 12px; font-size: 15px; outline: none; background: var(--kakao-gray); transition: 0.2s; }
-        .auth-input:focus { border-color: var(--kakao-dark); background: #fff; }
-        .auth-btn { width: 100%; padding: 15px; background: var(--kakao-yellow); color: var(--kakao-dark); border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .auth-btn:active { opacity: 0.8; }
-
-        /* Profile Setup */
-        .profile-setup { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; z-index: 100; background: var(--bg-main); }
-        .avatar-large { width: 120px; height: 120px; border-radius: 40px; background: var(--kakao-gray); display: flex; justify-content: center; align-items: center; margin-bottom: 20px; cursor: pointer; overflow: hidden; position: relative; border: 1px solid var(--border-color); }
-        .avatar-large img { width: 100%; height: 100%; object-fit: cover; }
-
         /* Header */
         .header { background: var(--bg-main); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); z-index: 10; flex-shrink: 0; }
         .header-title { font-size: 22px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
         .header-btn { background: none; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; width: 36px; height: 36px; border-radius: 50%; transition: 0.2s; }
         .header-btn:active { background: var(--kakao-gray); }
         .header-btn svg { width: 24px; height: 24px; fill: var(--text-main); }
-
-        /* Dropdown Menu */
-        #createMenu { position: absolute; top: 60px; left: 20px; background: white; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.15); z-index: 200; overflow: hidden; min-width: 150px; border: 1px solid var(--border-color); }
-        #createMenu button { display: block; width: 100%; padding: 12px 20px; border: none; background: none; text-align: right; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--text-main); border-bottom: 1px solid var(--kakao-gray); }
-        #createMenu button:active { background: var(--kakao-gray); }
 
         /* Views */
         .view-container { flex: 1; overflow-y: auto; position: relative; background: var(--bg-main); }
@@ -63,6 +45,14 @@
         .chat-meta { display: flex; flex-direction: column; align-items: flex-end; margin-right: 10px; }
         .chat-time { font-size: 11px; color: var(--text-muted); margin-bottom: 5px; }
         .unread-badge { background: var(--kakao-yellow); color: var(--kakao-dark); font-size: 11px; font-weight: bold; padding: 3px 7px; border-radius: 10px; display: none; }
+
+        /* Bottom Nav */
+        .bottom-nav { background: var(--bg-main); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0 20px 0; z-index: 100; flex-shrink: 0; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; cursor: pointer; color: var(--text-muted); transition: 0.2s; width: 60px; }
+        .nav-item svg { width: 24px; height: 24px; fill: var(--text-muted); transition: 0.2s; }
+        .nav-item span { font-size: 11px; font-weight: 600; }
+        .nav-item.active { color: var(--kakao-dark); }
+        .nav-item.active svg { fill: var(--kakao-dark); }
 
         /* Chat Room */
         .chat-room { flex: 1; display: flex; flex-direction: column; background: #B2C7D9; position: absolute; inset: 0; z-index: 50; transform: translateX(100%); transition: transform 0.3s ease; }
@@ -85,448 +75,61 @@
         .input-area input { flex: 1; padding: 12px 18px; border: none; background: var(--kakao-gray); border-radius: 24px; font-size: 14px; outline: none; }
         .input-area button { background: var(--kakao-yellow); color: var(--kakao-dark); border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
         .input-area button svg { width: 20px; height: 20px; fill: currentColor; }
-
-        /* Bottom Nav */
-        .bottom-nav { background: var(--bg-main); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0 20px 0; z-index: 100; flex-shrink: 0; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; cursor: pointer; color: var(--text-muted); transition: 0.2s; width: 60px; }
-        .nav-item svg { width: 24px; height: 24px; fill: var(--text-muted); transition: 0.2s; }
-        .nav-item span { font-size: 11px; font-weight: 600; }
-        .nav-item.active { color: var(--kakao-dark); }
-        .nav-item.active svg { fill: var(--kakao-dark); }
-
-        /* Contacts & Search */
-        .search-bar { padding: 15px 20px; background: var(--kakao-gray); display: flex; align-items: center; gap: 10px; margin: 10px 20px; border-radius: 12px; }
-        .search-bar input { flex: 1; background: none; border: none; outline: none; font-size: 15px; }
-        .list-item { display: flex; align-items: center; padding: 15px 20px; border-bottom: 1px solid var(--kakao-gray); cursor: pointer; }
-        .list-item:active { background: var(--kakao-gray); }
-
-        /* Modals */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center; z-index: 200; }
-        .modal-content { background: white; padding: 25px; border-radius: 20px; width: 90%; max-width: 350px; text-align: center; max-height: 85vh; overflow-y: auto; }
-        .modal-content h3 { margin-bottom: 20px; text-align: center; font-size: 18px; color: var(--kakao-dark); }
-        .modal-content input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 10px; font-family: inherit; outline: none; background: var(--kakao-gray); }
-        .modal-content button { width: 100%; padding: 14px; margin-bottom: 10px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 15px; }
-        .btn-primary { background: var(--kakao-yellow); color: var(--kakao-dark); }
-        .btn-secondary { background: var(--kakao-gray); color: var(--text-main); }
-        .btn-danger { background: #ef4444; color: white; }
-
-        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 12px 24px; border-radius: 20px; display: none; z-index: 1000; font-size: 14px; }
     </style>
 </head>
 <body>
 
-    <div class="toast" id="toast"></div>
-
-    <!-- Login Screen (Hidden if shared login is active) -->
-    <div id="loginScreen" class="hidden" style="position:fixed; inset:0; background:var(--bg-main); z-index:3000; display:flex; justify-content:center; align-items:center;">
-      <div class="modal-content" style="text-align:center;">
-        <div style="background:#fff; padding:10px; border-radius:16px; display:inline-block; margin-bottom:15px;">
-            <img src="https://ui-avatars.com/api/?name=Arisa+Chat&background=FEE500&color=3C1E1E&size=128&rounded=true" alt="ARISA" style="height:80px; object-fit: contain;">
-        </div>
-        <h2 style="margin-bottom:20px; color:var(--kakao-dark); font-weight:800;">Arisa Chat</h2>
-        <input type="text" id="loginUsername" class="auth-input" placeholder="نام کاربری (انگلیسی)" style="text-align:center;">
-        <input type="text" id="loginName" class="auth-input" placeholder="نام نمایشی" style="text-align:center;">
-        <input type="password" id="loginPassword" class="auth-input" placeholder="رمز عبور" style="text-align:center;">
-        <button id="loginBtn" class="auth-btn">ورود / ثبت‌نام</button>
-      </div>
-    </div>
-
-    <!-- Profile Setup -->
-    <div class="profile-setup hidden" id="profileSetupScreen">
-        <div class="avatar-large" onclick="document.getElementById('setupPicInput').click()">
-            <span id="setupPicText" style="font-size:13px; color:#666;">انتخاب عکس</span>
-            <input type="file" id="setupPicInput" accept="image/*" style="display: none;" onchange="previewSetupPic(event)">
-        </div>
-        <h2 style="margin-bottom: 20px; color: var(--kakao-dark);">پروفایل خود را بسازید</h2>
-        <button onclick="saveProfileSetup()" class="auth-btn" style="width: 200px;">ادامه</button>
-        <button onclick="skipProfileSetup()" style="background:none; border:none; margin-top:15px; color:#666; cursor:pointer;">رد کردن</button>
-    </div>
-
-    <!-- Main App -->
-    <div class="app-container hidden" id="mainApp">
+    <div class="app-container" id="mainApp">
         <div class="header">
             <div class="header-title" id="headerTitle">Arisa</div>
             <div class="flex" style="gap: 5px;">
-                <button class="header-btn" onclick="toggleCreateMenu()">
+                <button class="header-btn" onclick="alert('در حال توسعه')">
                     <svg viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/></svg>
                 </button>
-                <button class="header-btn" onclick="openProfileModal()">
+                <button class="header-btn" onclick="alert('در حال توسعه')">
                     <svg viewBox="0 0 24 24"><path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/></svg>
                 </button>
             </div>
         </div>
 
-        <div id="createMenu" class="hidden">
-            <button onclick="openCreateModal('private')">چت خصوصی</button>
-            <button onclick="openCreateModal('group')">ساخت گروه</button>
-            <button onclick="openCreateModal('channel')">ساخت کانال</button>
-        </div>
-
         <div class="view-container">
             <div class="view active" id="view-chats">
-                <div class="chat-list" id="chatListContainer"></div>
-            </div>
-
-            <div class="view" id="view-contacts">
-                <div class="search-bar">
-                    <svg viewBox="0 0 24 24" style="width:20px; fill:#666;"><path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/></svg>
-                    <input type="text" id="contactSearchInput" placeholder="جستجوی شناسه کاربری..." onkeypress="if(event.key==='Enter') searchUser()">
+                <div class="chat-list" id="chatListContainer">
+                    <!-- لیست چت ها اینجا می آید -->
+                    <div style="text-align:center; padding:30px; color:#999;">هنوز چتی ندارید. (نسخه تستی)</div>
                 </div>
-                <div id="contactsListContainer"></div>
-            </div>
-
-            <div class="view" id="view-settings">
-                <div class="list-item" onclick="openProfileModal()">
-                    <div class="avatar" style="width: 45px; height: 45px; border-radius: 15px;" id="settingsAvatar">Me</div>
-                    <div class="chat-info">
-                        <div class="chat-name" id="settingsName">نام من</div>
-                        <div class="chat-last-msg" id="settingsBio">بیوگرافی</div>
-                    </div>
-                </div>
-                <div class="list-item"><div class="chat-info"><div class="chat-name">اعلان‌ها</div></div></div>
-                <div class="list-item" style="color: #ef4444;" onclick="logout()"><div class="chat-info"><div class="chat-name">خروج از حساب</div></div></div>
             </div>
         </div>
 
         <div class="bottom-nav">
-            <button class="nav-item active" onclick="switchTab('chats')" id="nav-chats">
+            <button class="nav-item active" onclick="alert('فقط چت‌ها در دسترس است')">
                 <svg viewBox="0 0 24 24"><path d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z"/></svg>
                 <span>چت‌ها</span>
             </button>
-            <button class="nav-item" onclick="switchTab('contacts')" id="nav-contacts">
+            <button class="nav-item">
                 <svg viewBox="0 0 24 24"><path d="M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M8,13C5.33,13 0,14.34 0,17V19H16V17C16,14.34 10.67,13 8,13M16,13C15.71,13 15.38,13.02 15.03,13.05C16.2,13.9 17,15.27 17,17V19H24V17C24,14.34 18.67,13 16,13Z"/></svg>
                 <span>مخاطبین</span>
             </button>
-            <button class="nav-item" onclick="switchTab('settings')" id="nav-settings">
+            <button class="nav-item">
                 <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
                 <span>تنظیمات</span>
             </button>
         </div>
-
-        <div class="chat-room" id="chatRoomView">
-            <div class="chat-room-header">
-                <button class="header-btn" onclick="closeChatRoom()"><svg viewBox="0 0 24 24"><path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/></svg></button>
-                <div class="chat-room-title" id="chatRoomTitle"></div>
-                <button class="header-btn" id="chatRoomActionBtn" onclick="openChatInfoModal()"><svg viewBox="0 0 24 24"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,10.5A1.5,1.5 0 0,0 10.5,12A1.5,1.5 0 0,0 12,13.5A1.5,1.5 0 0,0 13.5,12A1.5,1.5 0 0,0 12,10.5M12,7A1.5,1.5 0 0,0 10.5,8.5A1.5,1.5 0 0,0 12,10A1.5,1.5 0 0,0 13.5,8.5A1.5,1.5 0 0,0 12,7M12,14A1.5,1.5 0 0,0 10.5,15.5A1.5,1.5 0 0,0 12,17A1.5,1.5 0 0,0 13.5,15.5A1.5,1.5 0 0,0 12,14Z"/></svg></button>
-            </div>
-            <div class="messages" id="chatMessages"></div>
-            <div class="input-area" id="chatInputArea">
-                <input type="text" id="chatInput" placeholder="پیام..." onkeypress="if(event.key==='Enter') sendChatMessage()">
-                <button onclick="sendChatMessage()"><svg viewBox="0 0 24 24"><path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/></svg></button>
-            </div>
-            <div id="channelFooter" class="hidden" style="padding: 15px; text-align: center; background: var(--bg-main); color: var(--text-muted); font-size: 13px; border-top: 1px solid var(--border-color);">فقط ادمین‌ها می‌توانند پیام بفرستند.</div>
-        </div>
     </div>
 
-    <div class="modal" id="createModal">
-        <div class="modal-content">
-            <h3 id="createModalTitle">ساخت جدید</h3>
-            <div class="avatar-large" id="createAvatarPicker" style="width: 80px; height: 80px; margin: 0 auto 15px; display: none;" onclick="document.getElementById('createPicInput').click()">
-                <img id="createPicPreview" src="" style="display:none;"><span id="createPicText" style="font-size:12px; color:#666;">عکس گروه</span>
-                <input type="file" id="createPicInput" accept="image/*" style="display: none;" onchange="previewCreatePic(event)">
-            </div>
-            <input type="text" id="createTargetId" placeholder="نام کاربری (برای چت خصوصی)">
-            <input type="text" id="createName" placeholder="نام نمایشی (برای گروه/کانال)">
-            <button onclick="submitCreate()" class="btn-primary">ساخت</button>
-            <button onclick="document.getElementById('createModal').style.display='none'" class="btn-secondary">انصراف</button>
-        </div>
-    </div>
-
-    <div class="modal" id="chatInfoModal">
-        <div class="modal-content">
-            <h3>اطلاعات گروه / کانال</h3>
-            <div id="adminSettings" class="hidden">
-                <div class="avatar-large" style="width: 80px; height: 80px; margin: 0 auto 15px;" onclick="document.getElementById('editChatPicInput').click()">
-                    <img id="editChatPicPreview" src="" style="display:none;"><span id="editChatPicText" style="font-size:12px;">تغییر عکس</span>
-                    <input type="file" id="editChatPicInput" accept="image/*" style="display: none;" onchange="previewEditChatPic(event)">
-                </div>
-                <input type="text" id="editChatName" placeholder="نام جدید گروه/کانال">
-                <button onclick="saveChatInfoChanges()" class="btn-primary">ذخیره تغییرات</button>
-                <hr style="margin: 20px 0; border: none; border-top: 1px solid var(--border-color);">
-                <h4 style="margin-bottom: 10px; color: var(--text-main);">افزودن عضو دستی</h4>
-                <input type="text" id="addMemberInput" placeholder="نام کاربری کاربر">
-                <button onclick="addMemberManually()" class="btn-secondary">افزودن به گروه</button>
-                <hr style="margin: 20px 0; border: none; border-top: 1px solid var(--border-color);">
-            </div>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;">لینک دعوت:</p>
-            <input type="text" id="inviteLinkInput" readonly style="text-align: center; direction: ltr;">
-            <button onclick="copyInviteLink()" class="btn-secondary">کپی لینک</button>
-            <button onclick="document.getElementById('chatInfoModal').style.display='none'" class="btn-secondary" style="margin-top:15px;">بستن</button>
-        </div>
-    </div>
-
-    <div class="modal" id="profileModal">
-        <div class="modal-content">
-            <h3>ویرایش پروفایل</h3>
-            <div class="avatar-large" style="width: 80px; height: 80px; margin: 0 auto 15px;" onclick="document.getElementById('editPicInput').click()">
-                <img id="editProfilePicPreview" src="" style="display:none;"><span id="editPicText" style="font-size:12px;">تغییر عکس</span>
-                <input type="file" id="editPicInput" accept="image/*" style="display: none;" onchange="previewEditPic(event)">
-            </div>
-            <input type="text" id="editName" placeholder="نام نمایشی">
-            <input type="text" id="editBio" placeholder="بیوگرافی">
-            <button onclick="saveProfileChanges()" class="btn-primary">ذخیره تغییرات</button>
-            <button onclick="document.getElementById('profileModal').style.display='none'" class="btn-secondary">بستن</button>
-        </div>
-    </div>
-
+    <!-- اسکریپت‌های اصلی برای جلوگیری از خطا -->
     <script>
-        const RENDER_URL = 'wss://arisa-live.onrender.com';
-        let ws = null, myUser = null, keepAliveTimer, currentChatId = null, currentCreateType = 'private', currentChatData = null;
-        let db, dbName = "ArisaChatDB", dbVersion = 1;
-
-        function initDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(dbName, dbVersion);
-                request.onerror = (e) => reject(e);
-                request.onsuccess = (e) => { db = e.target.result; resolve(); };
-                request.onupgradeneeded = (e) => {
-                    const db = e.target.result;
-                    if (!db.objectStoreNames.contains('users')) db.createObjectStore('users', { keyPath: 'username' });
-                    if (!db.objectStoreNames.contains('chats')) db.createObjectStore('chats', { keyPath: 'id' });
-                    if (!db.objectStoreNames.contains('messages')) { const msgStore = db.createObjectStore('messages', { keyPath: 'id', autoIncrement: true }); msgStore.createIndex('chatId', 'chatId', { unique: false }); }
-                    if (!db.objectStoreNames.contains('queue')) db.createObjectStore('queue', { keyPath: 'id', autoIncrement: true });
-                };
-            });
-        }
-
-        function saveData(storeName, data) { return new Promise((resolve) => { const tx = db.transaction(storeName, 'readwrite'); tx.objectStore(storeName).put(data).onsuccess = () => resolve(); }); }
-        function getData(storeName, key) { return new Promise((resolve) => { const req = db.transaction(storeName, 'readonly').objectStore(storeName).get(key); req.onsuccess = () => resolve(req.result); }); }
-        function getAllData(storeName) { return new Promise((resolve) => { const req = db.transaction(storeName, 'readonly').objectStore(storeName).getAll(); req.onsuccess = () => resolve(req.result); }); }
-
-        function showToast(msg) { const t = document.getElementById('toast'); if(t) { t.innerText = msg; t.style.display = 'block'; setTimeout(() => t.style.display = 'none', 3000); } }
-        function playNotificationSound() { try { const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); const oscillator = audioCtx.createOscillator(); const gainNode = audioCtx.createGain(); oscillator.connect(gainNode); gainNode.connect(audioCtx.destination); oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); oscillator.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.1); gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5); oscillator.start(); oscillator.stop(audioCtx.currentTime + 0.5); } catch(e) {} }
-
-        async function doLogin() {
-            const username = document.getElementById('loginUsername').value.trim();
-            const name = document.getElementById('loginName').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
-            if (!username || !name || !password) return showToast('لطفاً همه فیلدها را پر کنید');
-            const existingUser = await getData('users', username);
-            if (existingUser) { if (existingUser.password !== password) return showToast('رمز عبور اشتباه است!'); myUser = existingUser; startApp(); } 
-            else { myUser = { username, name, password, bio: '', pic: '', online: true }; await saveData('users', myUser); document.getElementById('loginScreen').classList.add('hidden'); document.getElementById('profileSetupScreen').classList.remove('hidden'); }
-        }
-
-        let tempProfilePic = '';
-        function previewSetupPic(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { tempProfilePic = ev.target.result; document.getElementById('setupPicText').style.display = 'none'; let img = document.getElementById('setupPicInput').parentElement.querySelector('img'); if(!img) { img = document.createElement('img'); document.getElementById('setupPicInput').parentElement.appendChild(img); } img.src = tempProfilePic; img.style.display = 'block'; }; reader.readAsDataURL(file); }
-        async function saveProfileSetup() { if(tempProfilePic) myUser.pic = tempProfilePic; await saveData('users', myUser); startApp(); }
-        async function skipProfileSetup() { startApp(); }
-
-        function startApp() {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('profileSetupScreen').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
-            connectWebSocket(); loadChatList(); updateProfileUI();
-        }
-
-        function updateProfileUI() {
-            document.getElementById('settingsName').innerText = myUser.name;
-            document.getElementById('settingsBio').innerText = myUser.bio || 'بیوگرافی تنظیم نشده';
-            const settingsAvatar = document.getElementById('settingsAvatar');
-            if(myUser.pic) settingsAvatar.innerHTML = `<img src="${myUser.pic}">`; else settingsAvatar.innerHTML = myUser.name.charAt(0);
-            const editPreview = document.getElementById('editProfilePicPreview');
-            const editText = document.getElementById('editPicText');
-            if(myUser.pic) { editPreview.src = myUser.pic; editPreview.style.display = 'block'; editText.style.display = 'none'; } else { editPreview.style.display = 'none'; editText.style.display = 'block'; }
-            document.getElementById('editName').value = myUser.name;
-            document.getElementById('editBio').value = myUser.bio || '';
-        }
-
-        function connectWebSocket() {
-            ws = new WebSocket(RENDER_URL);
-            ws.onopen = () => {
-                ws.send(JSON.stringify({ type: 'join', room: 'chat-users', userId: myUser.username }));
-                ws.send(JSON.stringify({ type: 'presence', room: 'chat-users', senderId: myUser.username, name: myUser.name, online: true }));
-                if(keepAliveTimer) clearInterval(keepAliveTimer);
-                keepAliveTimer = setInterval(() => { if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'ping' })); }, 5 * 60 * 1000);
-            };
-            ws.onmessage = async (event) => {
-                let msg = JSON.parse(event.data);
-                if (msg.type === 'pong' || msg.senderId === myUser.username) return;
-                if (msg.type === 'presence') { if (msg.online) processQueue(msg.senderId); } 
-                else if (msg.type === 'chat') { handleIncomingMessage(msg); }
-            };
-            ws.onclose = () => { clearInterval(keepAliveTimer); setTimeout(connectWebSocket, 3000); };
-        }
-
-        async function sendChatMessage() {
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if (!text || !currentChatId) return;
-            const msgData = { type: 'chat', chatId: currentChatId, senderId: myUser.username, senderName: myUser.name, text: text, timestamp: Date.now() };
-            await saveMessageToDB(currentChatId, msgData); renderMessages(currentChatId); input.value = '';
-            if (ws && ws.readyState === WebSocket.OPEN) { ws.send(JSON.stringify(msgData)); } else { await saveData('queue', msgData); showToast('پیام در صف قرار گرفت (آفلاین)'); }
-        }
-
-        async function processQueue(targetId) {
-            const queue = await getAllData('queue');
-            for (const msg of queue) { if (msg.chatId.includes(targetId)) { ws.send(JSON.stringify(msg)); db.transaction('queue', 'readwrite').objectStore('queue').delete(msg.id); } }
-        }
-
-        async function handleIncomingMessage(msg) {
-            if (!msg.chatId.includes(myUser.username) && !msg.chatId.startsWith('group_') && !msg.chatId.startsWith('channel_')) return;
-            await saveMessageToDB(msg.chatId, msg); playNotificationSound();
-            if (currentChatId === msg.chatId) { renderMessages(currentChatId); markAsRead(currentChatId); } 
-            else { await incrementUnread(msg.chatId); loadChatList(); }
-        }
-
-        async function loadChatList() {
-            const listContainer = document.getElementById('chatListContainer');
-            const chats = await getAllData('chats');
-            chats.sort((a, b) => (b.lastTimestamp || 0) - (a.lastTimestamp || 0));
-            listContainer.innerHTML = '';
-            if (chats.length === 0) { listContainer.innerHTML = '<div style="text-align:center; padding:30px; color:#999;">هنوز چتی ندارید</div>'; return; }
-            for (const chat of chats) {
-                const div = document.createElement('div'); div.className = 'chat-item'; div.onclick = () => openChatRoom(chat.id, chat.title, chat.pic, chat.admin);
-                const lastMsg = chat.lastMessage || 'بدون پیام'; const unreadCount = chat.unread || 0;
-                let avatarHtml = chat.pic ? `<img src="${chat.pic}">` : chat.title.charAt(0);
-                div.innerHTML = `<div class="avatar">${avatarHtml}</div><div class="chat-info"><div class="chat-name">${chat.title}</div><div class="chat-last-msg">${lastMsg}</div></div><div class="chat-meta"><div class="chat-time">${chat.lastTimestamp ? new Date(chat.lastTimestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</div>${unreadCount > 0 ? `<div class="unread-badge" style="display:block;">${unreadCount}</div>` : ''}</div>`;
-                listContainer.appendChild(div);
-            }
-        }
-
-        function toggleCreateMenu() { const menu = document.getElementById('createMenu'); menu.classList.toggle('hidden'); }
-        document.addEventListener('click', (e) => { const menu = document.getElementById('createMenu'); if (!menu.classList.contains('hidden') && !e.target.closest('.header-btn') && !e.target.closest('#createMenu')) { menu.classList.add('hidden'); } });
-
-        let tempCreatePic = '';
-        function previewCreatePic(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { tempCreatePic = ev.target.result; document.getElementById('createPicPreview').src = tempCreatePic; document.getElementById('createPicPreview').style.display = 'block'; document.getElementById('createPicText').style.display = 'none'; }; reader.readAsDataURL(file); }
-
-        function openCreateModal(type) {
-            currentCreateType = type; tempCreatePic = ''; document.getElementById('createMenu').classList.add('hidden'); document.getElementById('createModal').style.display = 'flex';
-            const title = document.getElementById('createModalTitle'); const targetInput = document.getElementById('createTargetId'); const nameInput = document.getElementById('createName'); const avatarPicker = document.getElementById('createAvatarPicker');
-            document.getElementById('createPicPreview').style.display = 'none'; document.getElementById('createPicText').style.display = 'block';
-            if (type === 'private') { title.innerText = 'چت خصوصی جدید'; targetInput.style.display = 'block'; nameInput.style.display = 'none'; avatarPicker.style.display = 'none'; } 
-            else if (type === 'group') { title.innerText = 'ساخت گروه جدید'; targetInput.style.display = 'none'; nameInput.style.display = 'block'; avatarPicker.style.display = 'flex'; } 
-            else if (type === 'channel') { title.innerText = 'ساخت کانال جدید'; targetInput.style.display = 'none'; nameInput.style.display = 'block'; avatarPicker.style.display = 'flex'; }
-        }
-
-        async function submitCreate() {
-            if (currentCreateType === 'private') {
-                const targetUser = document.getElementById('createTargetId').value.trim();
-                if (!targetUser || targetUser === myUser.username) return showToast('نام کاربری معتبر نیست');
-                const chatId = [myUser.username, targetUser].sort().join('_');
-                const existingChat = await getData('chats', chatId);
-                if (!existingChat) { await saveData('chats', { id: chatId, title: targetUser, type: 'private', unread: 0, lastTimestamp: Date.now() }); }
-                document.getElementById('createModal').style.display = 'none'; openChatRoom(chatId, targetUser, '', null);
-            } else {
-                const name = document.getElementById('createName').value.trim();
-                if (!name) return showToast('نام نمایشی را وارد کنید');
-                const chatId = currentCreateType + '_' + Date.now();
-                await saveData('chats', { id: chatId, title: name, type: currentCreateType, pic: tempCreatePic, unread: 0, lastTimestamp: Date.now(), admin: myUser.username, members: [myUser.username] });
-                document.getElementById('createModal').style.display = 'none'; openChatRoom(chatId, name, tempCreatePic, myUser.username);
-            }
-        }
-
-        async function openChatRoom(chatId, title, pic, admin) {
-            currentChatId = chatId; currentChatData = await getData('chats', chatId); document.getElementById('chatRoomView').classList.add('active');
-            let avatarHtml = pic ? `<img src="${pic}">` : title.charAt(0);
-            document.getElementById('chatRoomTitle').innerHTML = `<div class="avatar">${avatarHtml}</div> <span>${title}</span>`;
-            if (currentChatData && currentChatData.type !== 'private' && currentChatData.admin === myUser.username) document.getElementById('chatRoomActionBtn').classList.remove('hidden');
-            else if (currentChatData && currentChatData.type !== 'private') document.getElementById('chatRoomActionBtn').classList.remove('hidden');
-            else document.getElementById('chatRoomActionBtn').classList.add('hidden');
-            if (currentChatData && currentChatData.type === 'channel' && currentChatData.admin !== myUser.username) { document.getElementById('chatInputArea').classList.add('hidden'); document.getElementById('channelFooter').classList.remove('hidden'); } 
-            else { document.getElementById('chatInputArea').classList.remove('hidden'); document.getElementById('channelFooter').classList.add('hidden'); }
-            await markAsRead(chatId); loadChatList(); renderMessages(chatId);
-        }
+        // این نسخه تستی است تا فقط مطمئن شویم فایل لود می‌شود
+        console.log("Arisa Chat Loaded Successfully");
         
-        function closeChatRoom() { currentChatId = null; document.getElementById('chatRoomView').classList.remove('active'); }
-
-        async function renderMessages(chatId) {
-            const msgContainer = document.getElementById('chatMessages'); msgContainer.innerHTML = '';
-            const allMsgs = await getAllData('messages'); const chatMsgs = allMsgs.filter(m => m.chatId === chatId).sort((a,b) => a.timestamp - b.timestamp);
-            chatMsgs.forEach(msg => {
-                const isMine = msg.senderId === myUser.username; const div = document.createElement('div'); div.className = `msg ${isMine ? 'mine' : ''}`;
-                const timeStr = new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                div.innerHTML = `${!isMine ? `<span class="sender">${msg.senderName}</span>` : ''}<div class="text">${msg.text}</div><div class="msg-time">${timeStr}</div>`;
-                msgContainer.appendChild(div);
-            });
-            msgContainer.scrollTop = msgContainer.scrollHeight;
-        }
-
-        async function saveMessageToDB(chatId, msg) {
-            await saveData('messages', { ...msg, chatId });
-            const chat = await getData('chats', chatId) || { id: chatId, title: msg.chatId.replace(myUser.username, '').replace('_', ''), unread: 0 };
-            chat.lastMessage = msg.text; chat.lastTimestamp = msg.timestamp; await saveData('chats', chat);
-        }
-        async function incrementUnread(chatId) { const chat = await getData('chats', chatId); if (chat) { chat.unread = (chat.unread || 0) + 1; await saveData('chats', chat); } }
-        async function markAsRead(chatId) { const chat = await getData('chats', chatId); if (chat && chat.unread > 0) { chat.unread = 0; await saveData('chats', chat); } }
-
-        let newEditChatPic = '';
-        function previewEditChatPic(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { newEditChatPic = ev.target.result; document.getElementById('editChatPicPreview').src = newEditChatPic; document.getElementById('editChatPicPreview').style.display = 'block'; document.getElementById('editChatPicText').style.display = 'none'; }; reader.readAsDataURL(file); }
-
-        async function openChatInfoModal() {
-            if (!currentChatData) return;
-            if (currentChatData.admin === myUser.username) {
-                document.getElementById('adminSettings').classList.remove('hidden'); document.getElementById('editChatName').value = currentChatData.title;
-                if(currentChatData.pic) { document.getElementById('editChatPicPreview').src = currentChatData.pic; document.getElementById('editChatPicPreview').style.display = 'block'; document.getElementById('editChatPicText').style.display = 'none'; } 
-                else { document.getElementById('editChatPicPreview').style.display = 'none'; document.getElementById('editChatPicText').style.display = 'block'; }
-            } else { document.getElementById('adminSettings').classList.add('hidden'); }
-            const link = window.location.origin + window.location.pathname + '?invite=' + currentChatId; document.getElementById('inviteLinkInput').value = link;
-            document.getElementById('chatInfoModal').style.display = 'flex';
-        }
-
-        async function saveChatInfoChanges() {
-            if (!currentChatData || currentChatData.admin !== myUser.username) return;
-            const newName = document.getElementById('editChatName').value.trim(); if (newName) currentChatData.title = newName;
-            if (newEditChatPic) currentChatData.pic = newEditChatPic;
-            await saveData('chats', currentChatData); showToast('اطلاعات گروه/کانال به‌روزرسانی شد');
-            let avatarHtml = currentChatData.pic ? `<img src="${currentChatData.pic}">` : currentChatData.title.charAt(0);
-            document.getElementById('chatRoomTitle').innerHTML = `<div class="avatar">${avatarHtml}</div> <span>${currentChatData.title}</span>`;
-            loadChatList(); newEditChatPic = '';
-        }
-
-        async function addMemberManually() {
-            if (!currentChatData || currentChatData.admin !== myUser.username) return;
-            const usernameToAdd = document.getElementById('addMemberInput').value.trim(); if(!usernameToAdd) return;
-            const userExists = await getData('users', usernameToAdd); if(!userExists) return showToast('کاربری با این نام کاربری یافت نشد');
-            if(!currentChatData.members) currentChatData.members = [currentChatData.admin];
-            if(!currentChatData.members.includes(usernameToAdd)) { currentChatData.members.push(usernameToAdd); await saveData('chats', currentChatData); showToast('کاربر به گروه اضافه شد'); } 
-            else { showToast('کاربر قبلا در گروه است'); }
-        }
-
-        function copyInviteLink() { const input = document.getElementById('inviteLinkInput'); input.select(); input.setSelectionRange(0, 99999); navigator.clipboard.writeText(input.value); showToast('لینک دعوت کپی شد'); }
-
-        function switchTab(tab) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(`view-${tab}`).classList.add('active'); document.getElementById(`nav-${tab}`).classList.add('active');
-            const titles = { chats: 'Arisa', contacts: 'مخاطبین', settings: 'تنظیمات' }; document.getElementById('headerTitle').innerText = titles[tab];
-            if (tab === 'contacts') loadContacts();
-        }
-
-        async function loadContacts() { const container = document.getElementById('contactsListContainer'); container.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">شناسه کاربری را جستجو کنید</div>'; }
-
-        async function searchUser() {
-            const query = document.getElementById('contactSearchInput').value.trim(); if(!query) return;
-            const user = await getData('users', query); const container = document.getElementById('contactsListContainer');
-            if (user && user.username !== myUser.username) {
-                let avatarHtml = user.pic ? `<img src="${user.pic}">` : user.name.charAt(0);
-                container.innerHTML = `<div class="list-item" onclick="startChatFromContact('${user.username}', '${user.name}')"><div class="avatar">${avatarHtml}</div><div class="chat-info"><div class="chat-name">${user.name}</div><div class="chat-last-msg">@${user.username}</div></div></div>`;
-            } else { container.innerHTML = '<div style="text-align:center; padding:20px; color:#999;">کاربری یافت نشد</div>'; }
-        }
-
-        async function startChatFromContact(username, name) { document.getElementById('createTargetId').value = username; currentCreateType = 'private'; await submitCreate(); }
-
-        function openProfileModal() { updateProfileUI(); document.getElementById('profileModal').style.display = 'flex'; }
-        let newEditPic = '';
-        function previewEditPic(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { newEditPic = ev.target.result; document.getElementById('editProfilePicPreview').src = newEditPic; document.getElementById('editProfilePicPreview').style.display = 'block'; document.getElementById('editPicText').style.display = 'none'; }; reader.readAsDataURL(file); }
-        async function saveProfileChanges() {
-            myUser.name = document.getElementById('editName').value.trim(); myUser.bio = document.getElementById('editBio').value.trim(); if (newEditPic) myUser.pic = newEditPic;
-            await saveData('users', myUser); document.getElementById('profileModal').style.display = 'none'; updateProfileUI(); showToast('پروفایل ذخیره شد');
-        }
-
-        function logout() { if(confirm('از حساب خارج می‌شوید؟')) { localStorage.clear(); location.reload(); } }
-
-        // شروع خودکار پیام‌رسان از لاگین اصلی
-        window.addEventListener('load', async () => {
-            await initDB();
-            setTimeout(() => {
-                const savedUser = localStorage.getItem('arisa_user');
-                if(savedUser) {
-                    myUser = JSON.parse(savedUser);
-                    document.getElementById('loginScreen').classList.add('hidden');
-                    document.getElementById('mainApp').classList.remove('hidden');
-                    connectWebSocket(); loadChatList(); updateProfileUI();
-                }
-            }, 500);
-        });
+        // اگر از لاگین اصلی آمده‌ایم
+        window.onload = function() {
+            const savedUser = localStorage.getItem('arisa_user');
+            if (savedUser) {
+                const user = JSON.parse(savedUser);
+                console.log("Welcome " + user.name);
+            }
+        };
     </script>
 </body>
 </html>
