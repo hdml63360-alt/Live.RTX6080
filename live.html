@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Arisa Live | کلاس مجازی</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+
+<style>
+  :root {
+    --bg-main: #f8fafc; --bg-panel: #ffffff; --text-main: #0f172a; --text-muted: #64748b;
+    --primary: #0078d7; --primary-hover: #005a9e; --danger: #ef4444; --warning: #f59e0b; --success: #10b981; --border: #e2e8f0;
+    --bg-video: #e2e8f0; --bg-chat-in: #f1f5f9;
+  }
+  body.theme-dark { --bg-main: #0b1120; --bg-panel: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8; --primary: #10b981; --primary-hover: #059669; --danger: #ef4444; --warning: #f59e0b; --border: #334155; --bg-video: #0f172a; --bg-chat-in: #334155; }
+  body.theme-gold { --bg-main: #121212; --bg-panel: #1e1e1e; --text-main: #facc15; --text-muted: #a1a1aa; --primary: #eab308; --primary-hover: #ca8a04; --danger: #ef4444; --warning: #f59e0b; --success: #10b981; --border: #3f3f46; --bg-video: #000000; --bg-chat-in: #27272a; }
+  body.theme-adobe { --bg-main: #2b2b2b; --bg-panel: #383838; --text-main: #e0e0e0; --text-muted: #aaaaaa; --primary: #0078d7; --primary-hover: #005a9e; --danger: #d13438; --warning: #f59e0b; --success: #107c10; --border: #111111; --bg-video: #1a1a1a; --bg-chat-in: #4b4b4b; }
+  body.theme-ocean { --bg-main: #e0f2fe; --bg-panel: #ffffff; --text-main: #0c4a6e; --text-muted: #0284c7; --primary: #0ea5e9; --primary-hover: #0284c7; --danger: #ef4444; --warning: #f59e0b; --success: #10b981; --border: #bae6fd; --bg-video: #0c4a6e; --bg-chat-in: #bae6fd; }
+  body.theme-neon { --bg-main: #0f0a1a; --bg-panel: #1a1025; --text-main: #f8fafc; --text-muted: #a78bfa; --primary: #8b5cf6; --primary-hover: #7c3aed; --danger: #ef4444; --warning: #10b981; --success: #10b981; --border: #3b0764; --bg-video: #000000; --bg-chat-in: #2e1065; }
+  body.theme-gold .text-on-primary { color: #121212; }
+  body.theme-neon .avatar { color: #000; }
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Vazirmatn', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg-main); color: var(--text-main); height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; transition: background 0.3s, color 0.3s; }
+
+  .header { background: var(--bg-panel); height: 60px; display: flex; justify-content: space-between; align-items: center; padding: 0 16px; border-bottom: 1px solid var(--border); z-index: 50; flex-shrink: 0; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand img { height: 36px; width: auto; object-fit: contain; border-radius: 8px; }
+  .brand-title { font-weight: 800; font-size: 16px; color: var(--text-main); }
+  .brand-title span { color: var(--primary); }
+  .header-actions { display: flex; align-items: center; gap: 8px; }
+  .status-badge { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); background: var(--bg-main); padding: 4px 10px; border-radius: 20px; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; }
+  .status-dot.online { background: var(--success); }
+  .header-btn { width: 36px; height: 36px; border-radius: 8px; border: none; background: var(--bg-main); color: var(--text-main); display: flex; justify-content: center; align-items: center; cursor: pointer; }
+  .header-btn.danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+  .header-btn svg { width: 20px; height: 20px; fill: currentColor; }
+
+  .main-content { flex: 1; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+  .main-video-container { flex: 1; background: var(--bg-video); display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; padding: 16px; overflow-y: auto; align-content: start; }
+  .video-card { background: #000; border-radius: 12px; position: relative; aspect-ratio: 16/9; display: flex; justify-content: center; align-items: center; overflow: hidden; border: 1px solid var(--border); }
+  .video-card video { width: 100%; height: 100%; object-fit: cover; display: none; transform: scaleX(-1); }
+  .video-card video.active { display: block; }
+  .video-placeholder { text-align: center; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; position: absolute; top:0; left:0;}
+  .avatar { width: 50px; height: 50px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; justify-content: center; align-items: center; margin: 0 auto 8px; font-weight: bold; font-size: 20px; }
+
+  .panel-overlay { position: absolute; inset: 0; background: var(--bg-panel); z-index: 40; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s; }
+  .panel-overlay.active { transform: translateY(0); }
+  .panel-header { padding: 16px; border-bottom: 1px solid var(--border); font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+  .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-muted); }
+  #fullChatMessages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .msg { display: flex; flex-direction: column; max-width: 85%; }
+  .msg .sender { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+  .msg .text { background: var(--bg-chat-in); padding: 10px 14px; border-radius: 16px; border-top-right-radius: 4px; font-size: 14px; color: var(--text-main); word-wrap: break-word;}
+  .msg.mine { align-self: flex-end; }
+  .msg.mine .text { background: var(--primary); color: #fff; border-top-right-radius: 16px; border-top-left-radius: 4px; }
+  #attendeesList { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+  .attendee { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-main); border-radius: 12px; border: 1px solid var(--border); cursor: pointer; }
+  .attendee .avatar { margin: 0; width: 36px; height: 36px; font-size: 16px; }
+  
+  .live-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); border-radius: 12px; margin-bottom: 8px; }
+  .live-item .title { font-weight: bold; color: var(--danger); font-size: 13px; }
+  .btn-join-live { background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+
+  .bottom-chat-bar { background: var(--bg-panel); border-top: 1px solid var(--border); padding: 8px 12px; display: flex; gap: 8px; z-index: 30; flex-shrink: 0; align-items: center; }
+  .bottom-chat-bar input { flex: 1; padding: 10px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-main); color: var(--text-main); outline: none; font-size: 13px; }
+  .bottom-chat-bar button { background: var(--primary); color: #fff; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; flex-shrink: 0;}
+
+  .fab-container { position: absolute; bottom: calc(70px + env(safe-area-inset-bottom)); left: 16px; display: flex; flex-direction: column; gap: 12px; z-index: 50; }
+  .fab-wrapper { position: relative; }
+  .fab-btn { width: 48px; height: 48px; border-radius: 50%; border: none; background: var(--bg-panel); color: var(--text-main); box-shadow: 0 4px 12px rgba(0,0,0,0.2); cursor: pointer; display: flex; justify-content: center; align-items: center; }
+  .fab-btn svg { width: 22px; height: 22px; fill: currentColor; }
+  .fab-btn.active { background: var(--primary); color: #fff; }
+  .fab-btn:disabled { opacity: 0.5; cursor: not-allowed;}
+  .fab-btn.live-btn { background: var(--danger); color: white; animation: pulse-red 2s infinite; }
+
+  .badge { position: absolute; top: -2px; right: -2px; background: var(--danger); color: white; font-size: 10px; font-weight: bold; min-width: 18px; height: 18px; border-radius: 9px; display: none; justify-content: center; align-items: center; padding: 0 4px; border: 2px solid var(--bg-panel); }
+  .badge.show { display: flex; }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
+  .modal-overlay.active { display: flex; }
+  .modal-card { background: var(--bg-panel); border-radius: 16px; padding: 24px; width: 90%; max-width: 380px; border: 1px solid var(--border); }
+  .modal-card h3 { margin-bottom: 16px; text-align: center; color: var(--text-main); }
+  .modal-card input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-main); color: var(--text-main); outline: none; }
+  .perm-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; background: var(--bg-main); padding: 12px; border-radius: 8px; }
+  .btn-allow { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-left: 8px; }
+  .btn-deny { background: var(--danger); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+  .theme-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .theme-btn { padding: 12px; border-radius: 8px; border: 2px solid var(--border); cursor: pointer; text-align: center; font-size: 13px; font-weight: bold; }
+  .theme-btn.t-light { background: #f8fafc; color: #0078d7; }
+  .theme-btn.t-dark { background: #0b1120; color: #10b981; }
+  .theme-btn.t-gold { background: #121212; color: #eab308; }
+  .theme-btn.t-adobe { background: #2b2b2b; color: #0078d7; }
+  .theme-btn.t-ocean { background: #e0f2fe; color: #0ea5e9; }
+  .theme-btn.t-neon { background: #0f0a1a; color: #8b5cf6; }
+  @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+</style>
+</head>
+<body>
+
+<div id="loginScreen" style="position:fixed; inset:0; background:var(--bg-main); z-index:3000; display:flex; justify-content:center; align-items:center;">
+  <div class="modal-card" style="text-align:center;">
+    <div style="background:#fff; padding:10px; border-radius:16px; display:inline-block; margin-bottom:15px;">
+        <img src="https://ui-avatars.com/api/?name=Arisa+Live&background=0078d7&color=fff&size=128&rounded=true" alt="ARISA" style="height:80px; object-fit: contain;">
+    </div>
+    <h2 style="margin-bottom:20px; color:var(--primary); font-weight:800;">Arisa Live</h2>
+    <input type="text" id="nameInput" placeholder="نام شما" style="text-align:center;">
+    <label style="display:flex; justify-content:center; gap:8px; margin-bottom:20px; color:var(--text-muted); cursor: pointer;">
+      <input type="checkbox" id="isTeacherCheck" style="width:18px; height:18px;"> من استاد هستم
+    </label>
+    <button id="loginBtn" style="width:100%; padding:14px; background:var(--primary); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">ورود به کلاس</button>
+  </div>
+</div>
+
+<div class="header">
+  <div class="brand">
+    <div style="background:#fff; padding:2px; border-radius:8px; display:flex;">
+        <img src="https://ui-avatars.com/api/?name=A&background=0078d7&color=fff&size=64&rounded=true" alt="ARISA">
+    </div>
+    <div class="brand-title">Arisa <span>Live</span></div>
+  </div>
+  <div class="header-actions">
+    <div class="status-badge"><span id="statusText">در انتظار...</span><div class="status-dot" id="statusDot"></div></div>
+    <button class="header-btn" id="settingsBtn" title="تنظیمات"><svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg></button>
+    <button class="header-btn danger" id="leaveBtn" title="خروج"><svg viewBox="0 0 24 24"><path d="M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z"/></svg></button>
+  </div>
+</div>
+
+<div class="main-content">
+  <div class="main-video-container" id="mainVideoContainer"></div>
+  <div class="panel-overlay" id="chatPanel">
+    <div class="panel-header"><span>تاریخچه چت</span><button class="close-btn" onclick="togglePanel('chatPanel', false)">×</button></div>
+    <div id="fullChatMessages"></div>
+  </div>
+  <div class="panel-overlay" id="attendeesPanel">
+    <div class="panel-header"><span>لیست حاضرین</span><button class="close-btn" onclick="togglePanel('attendeesPanel', false)">×</button></div>
+    <div style="padding: 16px 16px 0;" id="activeLiveContainer"></div>
+    <div id="attendeesList"></div>
+  </div>
+  <div class="bottom-chat-bar">
+    <input type="text" id="quickChatInput" placeholder="پیام سریع...">
+    <button id="quickSendBtn"><svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor;"><path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/></svg></button>
+  </div>
+  <div class="fab-container">
+    <div class="fab-wrapper" id="startLiveWrapper" style="display:none;">
+      <button class="fab-btn live-btn" id="startLiveFab" title="شروع لایو"><svg viewBox="0 0 24 24"><path d="M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z"/></svg></button>
+    </div>
+    <div class="fab-wrapper" id="shareScreenWrapper" style="display:none;">
+      <button class="fab-btn" id="shareScreenBtn" title="اشتراک صفحه"><svg viewBox="0 0 24 24"><path d="M21,14H3V4H21M21,2H3C1.89,2 1,2.89 1,4V16A2,2 0 0,0 3,18H10L8,21V22H16V21L14,18H21A2,2 0 0,0 23,16V4C23,2.89 22.1,2 21,2Z"/></svg></button>
+    </div>
+    <div class="fab-wrapper">
+      <button class="fab-btn" id="chatFab" onclick="togglePanel('chatPanel')" title="چت"><svg viewBox="0 0 24 24"><path d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z"/></svg></button>
+      <div class="badge" id="chatBadge">0</div>
+    </div>
+    <div class="fab-wrapper">
+      <button class="fab-btn" id="attendeesFab" onclick="togglePanel('attendeesPanel')" title="حاضرین"><svg viewBox="0 0 24 24"><path d="M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M8,13C5.33,13 0,14.34 0,17V19H16V17C16,14.34 10.67,13 8,13M16,13C15.71,13 15.38,13.02 15.03,13.05C16.2,13.9 17,15.27 17,17V19H24V17C24,14.34 18.67,13 16,13Z"/></svg></button>
+      <div class="badge show" id="attendeesBadge">1</div>
+    </div>
+    <div class="fab-wrapper">
+      <button class="fab-btn" id="micBtn" disabled title="میکروفون"><svg viewBox="0 0 24 24"><path d="M12,14A3,3 0 0,0 15,11V5A3,3 0 0,0 12,2A3,3 0 0,0 9,5V11A3,3 0 0,0 12,14M19,11A7,7 0 0,1 12,18A7,7 0 0,1 5,11H3A9,9 0 0,0 11,19.93V23H13V19.93A9,9 0 0,0 21,11H19Z"/></svg></button>
+    </div>
+    <div class="fab-wrapper">
+      <button class="fab-btn" id="camBtn" disabled title="دوربین"><svg viewBox="0 0 24 24"><path d="M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z"/></svg></button>
+    </div>
+    <div class="fab-wrapper" id="handWrapper" style="display:none;">
+      <button class="fab-btn" id="handBtn" title="بلند کردن دست"><svg viewBox="0 0 24 24"><path d="M21,10.5V18A3,3 0 0,1 18,21H11.5L7,23V18.5C4.5,17.5 3,15.5 3,13V10.5C3,9.5 3.5,9 4.5,9C5.5,9 6,9.5 6,10.5V13H8V5.5C8,4.5 8.5,4 9.5,4C10.5,4 11,4.5 11,5.5V13H13V7.5C13,6.5 13.5,6 14.5,6C15.5,6 16,6.5 16,7.5V13H18V10.5C18,9.5 18.5,9 19.5,9C20.5,9 21,9.5 21,10.5Z"/></svg></button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="permModal">
+  <div class="modal-card">
+    <h3>مدیریت دسترسی</h3>
+    <p id="permTargetName" style="text-align:center; margin-bottom:20px; color:var(--primary); font-weight:bold;"></p>
+    <div class="perm-row"><span>میکروفون</span><div><button class="btn-allow" onclick="allowPerm('mic')">تایید</button><button class="btn-deny" onclick="denyPerm('mic')">لغو</button></div></div>
+    <div class="perm-row"><span>دوربین</span><div><button class="btn-allow" onclick="allowPerm('cam')">تایید</button><button class="btn-deny" onclick="denyPerm('cam')">لغو</button></div></div>
+    <button onclick="document.getElementById('permModal').classList.remove('active')" style="width:100%; padding:12px; background:var(--bg-main); color:var(--text-main); border:none; border-radius:8px; cursor:pointer;">بستن</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="startLiveModal">
+  <div class="modal-card">
+    <h3>شروع پخش زنده</h3>
+    <input type="text" id="liveTitleInput" placeholder="نام لایو (مثلاً: ریاضی ۲)">
+    <input type="password" id="livePasswordInput" placeholder="رمز عبور لایو">
+    <div style="display:flex; gap:10px; margin-top:16px;">
+      <button onclick="submitStartLive()" style="flex:1; padding:12px; background:var(--danger); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">شروع</button>
+      <button onclick="document.getElementById('startLiveModal').classList.remove('active')" style="flex:1; padding:12px; background:var(--bg-main); color:var(--text-main); border:none; border-radius:8px; cursor:pointer;">انصراف</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="joinLiveModal">
+  <div class="modal-card">
+    <h3>ورود به لایو</h3>
+    <p id="joinLiveTitle" style="text-align:center; margin-bottom:16px; font-weight:bold; color:var(--primary);"></p>
+    <input type="password" id="joinPasswordInput" placeholder="رمز لایو را وارد کنید">
+    <div style="display:flex; gap:10px; margin-top:16px;">
+      <button onclick="submitJoinLive()" style="flex:1; padding:12px; background:var(--primary); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">ورود</button>
+      <button onclick="document.getElementById('joinLiveModal').classList.remove('active')" style="flex:1; padding:12px; background:var(--bg-main); color:var(--text-main); border:none; border-radius:8px; cursor:pointer;">انصراف</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal-card">
+    <h3>انتخاب تم برنامه</h3>
+    <div class="theme-options">
+      <div class="theme-btn t-light" onclick="changeTheme('theme-light')">روشن (آبی)</div>
+      <div class="theme-btn t-dark" onclick="changeTheme('theme-dark')">شب (تیره)</div>
+      <div class="theme-btn t-gold" onclick="changeTheme('theme-gold')">مشکی و طلایی</div>
+      <div class="theme-btn t-adobe" onclick="changeTheme('theme-adobe')">ادوبی (خاکستری)</div>
+      <div class="theme-btn t-ocean" onclick="changeTheme('theme-ocean')">اقیانوس (فیروزه‌ای)</div>
+      <div class="theme-btn t-neon" onclick="changeTheme('theme-neon')">نئون (بنفش)</div>
+    </div>
+    <button onclick="document.getElementById('settingsModal').classList.remove('active')" style="width:100%; padding:12px; background:var(--bg-main); color:var(--text-main); border:none; border-radius:8px; cursor:pointer;">بستن</button>
+  </div>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const RENDER_URL = 'wss://arisa-live.onrender.com'; 
+  const ROOM_ID = 'arisa-main-room';
+
+  window.changeTheme = (themeClass) => {
+    document.body.className = ''; 
+    if (themeClass !== 'theme-light') document.body.classList.add(themeClass);
+    localStorage.setItem('arisa-theme', themeClass);
+    $('settingsModal').classList.remove('active');
+  };
+
+  window.togglePanel = (panelId, forceState) => {
+    const panel = $(panelId);
+    if (forceState === true) panel.classList.add('active');
+    else if (forceState === false) panel.classList.remove('active');
+    else panel.classList.toggle('active');
+
+    if(panelId === 'chatPanel' && panel.classList.contains('active')) {
+      unreadMessages = 0;
+      $('chatBadge').classList.remove('show');
+    }
+  };
+
+  const savedTheme = localStorage.getItem('arisa-theme');
+  if (savedTheme && savedTheme !== 'theme-light') document.body.classList.add(savedTheme);
+
+  let myName = '', isTeacher = false, myId = 'user_' + Math.random().toString(36).substr(2, 9);
+  let ws = null;
+  let attendees = {}, peerConnections = {}, selectedPeerId = null; 
+  let localStream = null, screenStream = null, micEnabled = false, camEnabled = false, screenSharing = false, handRaised = false;
+  let unreadMessages = 0;
+  let signalQueues = {}; 
+  let activeLive = null, hasJoinedLive = false; 
+  let keepAliveTimer = null;
+
+  const rtcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }] };
+
+  $('settingsBtn').addEventListener('click', () => $('settingsModal').classList.add('active'));
+  $('quickSendBtn').addEventListener('click', sendQuickChat);
+  $('quickChatInput').addEventListener('keypress', (e) => { if(e.key === 'Enter') sendQuickChat(); });
+
+  function sendQuickChat() {
+    const input = $('quickChatInput');
+    const text = input.value.trim();
+    if(!text) return;
+    addChatMsg(text, myName + ' (شما)', true);
+    sendSignalData({ type: 'chat', text, name: myName });
+    input.value = '';
+  }
+
+  function addChatMsg(text, sender, isMine) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `msg ${isMine ? 'mine' : ''}`;
+    msgDiv.innerHTML = `<div class="sender">${sender}</div><div class="text">${text}</div>`;
+    $('fullChatMessages').appendChild(msgDiv);
+    $('fullChatMessages').scrollTop = $('fullChatMessages').scrollHeight;
+    if(!isMine && !$('chatPanel').classList.contains('active')) {
+      unreadMessages++;
+      $('chatBadge').textContent = unreadMessages;
+      $('chatBadge').classList.add('show');
+    }
+  }
+
+  // ورود خودکار از صفحه اصلی
+  window.addEventListener('load', () => {
+      const savedUser = localStorage.getItem('arisa_user');
+      if (savedUser) {
+          const user = JSON.parse(savedUser);
+          $('nameInput').value = user.name;
+          setTimeout(() => { $('loginBtn').click(); }, 200);
+      }
+  });
+
+  $('loginBtn').addEventListener('click', async () => {
+    myName = $('nameInput').value.trim();
+    isTeacher = $('isTeacherCheck').checked;
+    if (!myName) return alert('لطفاً نام خود را وارد کنید');
+
+    $('loginScreen').style.display = 'none';
+    
+    if (isTeacher) { 
+      $('micBtn').disabled = false; $('camBtn').disabled = false; 
+      $('startLiveWrapper').style.display = 'block';
+      $('shareScreenWrapper').style.display = 'block';
+    } else { 
+      $('handWrapper').style.display = 'block'; 
+    }
+
+    attendees['me'] = { name: myName + ' (شما)', role: isTeacher ? 'teacher' : 'student', hand: false };
+    addAttendeeCard('me', attendees['me']);
+    renderAttendees();
+    connectToRender();
+  });
+
+  function connectToRender() {
+    ws = new WebSocket(RENDER_URL);
+    ws.onopen = () => {
+      $('statusDot').classList.add('online'); $('statusText').textContent = 'متصل';
+      ws.send(JSON.stringify({ type: 'join', room: ROOM_ID, userId: myId }));
+      setTimeout(() => { sendSignalData({ type: 'presence', name: myName, role: isTeacher ? 'teacher' : 'student', hand: handRaised }); }, 500);
+      if(keepAliveTimer) clearInterval(keepAliveTimer);
+      keepAliveTimer = setInterval(() => { if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'ping' })); }, 5 * 60 * 1000); 
+    };
+    ws.onmessage = (event) => { let msg; try { msg = JSON.parse(event.data); } catch { return; } if (msg.type === 'pong' || msg.senderId === myId) return; handleIncomingMessage(msg); };
+    ws.onclose = () => { $('statusDot').classList.remove('online'); $('statusText').textContent = 'قطع شد'; if(keepAliveTimer) clearInterval(keepAliveTimer); };
+  }
+
+  function sendSignalData(data, targetId = null) { if (!ws || ws.readyState !== WebSocket.OPEN) return; data.senderId = myId; data.targetId = targetId; ws.send(JSON.stringify(data)); }
+
+  function handleIncomingMessage(msg) {
+    if (msg.targetId && msg.targetId !== myId) return;
+    const senderId = msg.senderId;
+    switch(msg.type) {
+      case 'presence':
+        if (!attendees[senderId]) {
+          attendees[senderId] = { name: msg.name, role: msg.role, hand: msg.hand };
+          addAttendeeCard(senderId, attendees[senderId]); renderAttendees();
+          if (isTeacher && (localStream || screenStream)) createOffer(senderId);
+          if (activeLive && isTeacher) sendSignalData({ type: 'live', liveType: 'start', ...activeLive }, senderId);
+        }
+        break;
+      case 'chat': const senderName = attendees[senderId] ? attendees[senderId].name : msg.name; addChatMsg(msg.text, senderName, false); break;
+      case 'signal':
+        if (!signalQueues[senderId]) signalQueues[senderId] = Promise.resolve();
+        signalQueues[senderId] = signalQueues[senderId].then(async () => {
+          try { if (msg.sigType === 'offer') await handleOffer(msg.sdp, senderId); else if (msg.sigType === 'answer') await handleAnswer(msg.sdp, senderId); else if (msg.sigType === 'candidate') await handleCandidate(msg.candidate, senderId); } catch (e) {}
+        });
+        break;
+      case 'perm':
+        if (isTeacher) return;
+        if (msg.permType === 'mic') { $('micBtn').disabled = !msg.allowed; if (!msg.allowed && micEnabled) { micEnabled = false; $('micBtn').classList.remove('active'); if(localStream) localStream.getAudioTracks().forEach(t=>t.enabled=false); } } 
+        else if (msg.permType === 'cam') { $('camBtn').disabled = !msg.allowed; if (!msg.allowed && camEnabled) stopCamera(); }
+        break;
+      case 'hand': if (attendees[senderId]) { attendees[senderId].hand = msg.raised; renderAttendees(); } break;
+      case 'board': if (msg.boardType === 'draw') drawSegment(msg.x1, msg.y1, msg.x2, msg.y2, false); else if (msg.boardType === 'clear') { if(ctx) ctx.clearRect(0, 0, canvas.width, canvas.height); } break;
+      case 'live':
+        if (msg.liveType === 'start') { activeLive = { title: msg.title, password: msg.password, teacherName: msg.teacherName }; renderActiveLive(); if (!isTeacher) addChatMsg(`استاد لایو جدیدی شروع کرد: ${msg.title}`, 'سیستم', false); } 
+        else if (msg.liveType === 'end') { activeLive = null; hasJoinedLive = false; renderActiveLive(); if (!isTeacher) addChatMsg('لایو توسط استاد پایان یافت', 'سیستم', false); }
+        break;
+    }
+  }
+
+  $('startLiveFab').addEventListener('click', () => {
+    if (activeLive) { if (confirm('لایو فعال است. آیا می‌خواهید آن را پایان دهید؟')) { activeLive = null; sendSignalData({ type: 'live', liveType: 'end' }); renderActiveLive(); $('startLiveFab').classList.remove('active'); } return; }
+    $('liveTitleInput').value = ''; $('livePasswordInput').value = ''; $('startLiveModal').classList.add('active');
+  });
+
+  window.submitStartLive = () => { const title = $('liveTitleInput').value.trim(); const password = $('livePasswordInput').value.trim(); if (!title || !password) return alert('نام و رمز لایو الزامی است'); activeLive = { title, password, teacherName: myName }; sendSignalData({ type: 'live', liveType: 'start', ...activeLive }); $('startLiveModal').classList.remove('active'); $('startLiveFab').classList.add('active'); renderActiveLive(); };
+  window.openJoinLiveModal = () => { if(!activeLive) return; $('joinLiveTitle').textContent = activeLive.title; $('joinPasswordInput').value = ''; $('joinLiveModal').classList.add('active'); };
+  window.submitJoinLive = () => { const pass = $('joinPasswordInput').value.trim(); if(pass === activeLive.password) { hasJoinedLive = true; $('joinLiveModal').classList.remove('active'); renderActiveLive(); Object.keys(peerConnections).forEach(id => createOffer(id)); } else { alert('رمز عبور اشتباه است'); } };
+
+  function renderActiveLive() {
+    const container = $('activeLiveContainer');
+    if (activeLive) {
+      if (isTeacher) container.innerHTML = `<div class="live-item" style="background:rgba(16,185,129,0.1); border-color:var(--success);"><div class="title" style="color:var(--success);">لایو شما فعال است: ${activeLive.title}</div></div>`;
+      else { if (hasJoinedLive) container.innerHTML = `<div class="live-item" style="background:rgba(16,185,129,0.1); border-color:var(--success);"><div class="title" style="color:var(--success);">شما در لایو هستید</div></div>`; else container.innerHTML = `<div class="live-item"><div class="title">${activeLive.title}</div><button class="btn-join-live" onclick="openJoinLiveModal()">ورود</button></div>`; }
+    } else { container.innerHTML = ''; }
+  }
+
+  window.openPermModal = (peerId) => { if (!isTeacher || peerId === 'me') return; selectedPeerId = peerId; $('permTargetName').textContent = attendees[peerId].name; $('permModal').classList.add('active'); };
+  window.allowPerm = (type) => { if (selectedPeerId) sendSignalData({ type: 'perm', permType: type, allowed: true }, selectedPeerId); $('permModal').classList.remove('active'); };
+  window.denyPerm = (type) => { if (selectedPeerId) sendSignalData({ type: 'perm', permType: type, allowed: false }, selectedPeerId); $('permModal').classList.remove('active'); };
+
+  function createPeerConnection(peerId) {
+    if (peerConnections[peerId]) return peerConnections[peerId];
+    const pc = new RTCPeerConnection(rtcConfig); peerConnections[peerId] = pc; signalQueues[peerId] = Promise.resolve();
+    if (localStream) localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+    if (screenStream) screenStream.getTracks().forEach(track => pc.addTrack(track, screenStream));
+    pc.onicecandidate = (event) => { if (event.candidate) sendSignalData({ type: 'signal', sigType: 'candidate', candidate: event.candidate }, peerId); };
+    pc.ontrack = (event) => {
+      if (!isTeacher && activeLive && !hasJoinedLive) return;
+      const videoEl = document.getElementById('stream-' + peerId);
+      if (videoEl && videoEl.srcObject !== event.streams[0]) { videoEl.srcObject = event.streams[0]; videoEl.classList.add('active'); const ph = document.getElementById('placeholder-' + peerId); if (ph) ph.style.display = 'none'; }
+    };
+    return pc;
+  }
+
+  async function createOffer(peerId) {
+    if (!signalQueues[peerId]) signalQueues[peerId] = Promise.resolve();
+    signalQueues[peerId] = signalQueues[peerId].then(async () => {
+      try { const pc = createPeerConnection(peerId); if (pc.signalingState !== 'stable') return; const offer = await pc.createOffer(); await pc.setLocalDescription(offer); sendSignalData({ type: 'signal', sigType: 'offer', sdp: pc.localDescription }, peerId); } catch(e) {}
+    });
+  }
+
+  async function handleOffer(sdp, peerId) { const pc = createPeerConnection(peerId); if (pc.signalingState !== 'stable') { if(pc.signalingState === 'have-local-offer') return; } await pc.setRemoteDescription(new RTCSessionDescription(sdp)); const answer = await pc.createAnswer(); await pc.setLocalDescription(answer); sendSignalData({ type: 'signal', sigType: 'answer', sdp: pc.localDescription }, peerId); }
+  async function handleAnswer(sdp, peerId) { const pc = peerConnections[peerId]; if (!pc) return; if (pc.signalingState !== 'have-local-offer') return; await pc.setRemoteDescription(new RTCSessionDescription(sdp)); }
+  async function handleCandidate(candidate, peerId) { const pc = peerConnections[peerId]; if (!pc) return; try { await pc.addIceCandidate(new RTCIceCandidate(candidate)); } catch (e) {} }
+
+  $('micBtn').addEventListener('click', async () => {
+    if ($('micBtn').disabled) return;
+    if(!localStream) {
+       try { localStream = await navigator.mediaDevices.getUserMedia({ audio: true }); micEnabled = true; $('micBtn').classList.add('active'); Object.keys(peerConnections).forEach(id => { localStream.getTracks().forEach(track => { if(!peerConnections[id].getSenders().find(s => s.track === track)) peerConnections[id].addTrack(track, localStream); }); createOffer(id); }); } 
+       catch(e) { alert('دسترسی به میکروفون رد شد'); }
+    } else { micEnabled = !micEnabled; $('micBtn').classList.toggle('active', micEnabled); localStream.getAudioTracks().forEach(t => t.enabled = micEnabled); }
+  });
+
+  $('camBtn').addEventListener('click', async () => {
+    if ($('camBtn').disabled) return;
+    try {
+      if (!camEnabled) {
+        if(!localStream || localStream.getVideoTracks().length === 0) {
+           const videoStream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 640 }, height: { ideal: 480 } } });
+           if(localStream) videoStream.getVideoTracks().forEach(t => localStream.addTrack(t));
+           else { localStream = videoStream; if(micEnabled) { const audioStream = await navigator.mediaDevices.getUserMedia({audio:true}); audioStream.getAudioTracks().forEach(t => localStream.addTrack(t)); } }
+        }
+        camEnabled = true; $('camBtn').classList.add('active');
+        if (!screenSharing) { const myVideo = document.getElementById('stream-me'); if (myVideo) { myVideo.srcObject = localStream; myVideo.classList.add('active'); document.getElementById('placeholder-me').style.display = 'none'; } }
+        Object.keys(peerConnections).forEach(id => { const pc = peerConnections[id]; localStream.getVideoTracks().forEach(track => { if (!pc.getSenders().find(s => s.track === track)) pc.addTrack(track, localStream); }); createOffer(id); });
+      } else { stopCamera(); }
+    } catch (err) { alert('خطا در دسترسی به دوربین'); }
+  });
+
+  function stopCamera() {
+    if(localStream) {
+      localStream.getVideoTracks().forEach(t => t.stop()); localStream.getVideoTracks().forEach(t => localStream.removeTrack(t));
+      camEnabled = false; $('camBtn').classList.remove('active');
+      if (!screenSharing) { const myVideo = document.getElementById('stream-me'); if (myVideo) { myVideo.srcObject = null; myVideo.classList.remove('active'); document.getElementById('placeholder-me').style.display = 'flex'; } }
+    }
+  }
+
+  $('shareScreenBtn').addEventListener('click', async () => {
+    if(!screenSharing) {
+      try {
+        screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true }); screenSharing = true; $('shareScreenBtn').classList.add('active');
+        const myVideo = document.getElementById('stream-me'); if(myVideo) { myVideo.srcObject = screenStream; myVideo.classList.add('active'); document.getElementById('placeholder-me').style.display = 'none'; }
+        Object.keys(peerConnections).forEach(id => { const pc = peerConnections[id]; screenStream.getTracks().forEach(track => pc.addTrack(track, screenStream)); createOffer(id); });
+        screenStream.getVideoTracks()[0].onended = () => { stopScreenShare(); };
+      } catch(e) {}
+    } else { stopScreenShare(); }
+  });
+
+  function stopScreenShare() {
+    if(screenStream) { screenStream.getTracks().forEach(t => t.stop()); screenStream = null; }
+    screenSharing = false; $('shareScreenBtn').classList.remove('active');
+    const myVideo = document.getElementById('stream-me');
+    if(camEnabled && localStream) { myVideo.srcObject = localStream; } else { myVideo.srcObject = null; myVideo.classList.remove('active'); document.getElementById('placeholder-me').style.display = 'flex'; }
+  }
+
+  $('handBtn').addEventListener('click', () => { handRaised = !handRaised; $('handBtn').classList.toggle('hand-raised', handRaised); attendees['me'].hand = handRaised; sendSignalData({ type: 'hand', raised: handRaised }); renderAttendees(); });
+
+  function renderAttendees() {
+    const list = $('attendeesList'); list.innerHTML = ''; const keys = Object.keys(attendees); $('attendeesBadge').textContent = keys.length;
+    keys.forEach(id => {
+      const user = attendees[id]; const isManageable = isTeacher && user.role === 'student' && id !== 'me'; const clickAction = isManageable ? `onclick="openPermModal('${id}')"` : '';
+      const handIcon = user.hand ? `<svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:var(--warning);margin-right:8px;"><path d="M21,10.5V18A3,3 0 0,1 18,21H11.5L7,23V18.5C4.5,17.5 3,15.5 3,13V10.5C3,9.5 3.5,9 4.5,9C5.5,9 6,9.5 6,10.5V13H8V5.5C8,4.5 8.5,4 9.5,4C10.5,4 11,4.5 11,5.5V13H13V7.5C13,6.5 13.5,6 14.5,6C15.5,6 16,6.5 16,7.5V13H18V10.5C18,9.5 18.5,9 19.5,9C20.5,9 21,9.5 21,10.5Z"/></svg>` : '';
+      list.innerHTML += `<div class="attendee" ${clickAction} ${isManageable ? 'style="border-color:var(--primary);"' : ''}><div class="avatar">${user.name.charAt(0)}</div><div class="info"><div class="name" style="display:flex; align-items:center;">${user.name} ${handIcon}</div></div></div>`;
+    });
+  }
+
+  function addAttendeeCard(peerId, user) {
+    const container = $('mainVideoContainer'); if (document.getElementById('card-' + peerId)) return;
+    const card = document.createElement('div'); card.className = 'video-card'; card.id = 'card-' + peerId;
+    card.innerHTML = `<video id="stream-${peerId}" autoplay playsinline webkit-playsinline muted="${peerId === 'me'}"></video><div class="video-placeholder" id="placeholder-${peerId}"><div class="avatar">${user.name.charAt(0)}</div><div>${user.name}</div></div>`;
+    container.appendChild(card);
+    if (peerId === 'me') { if (screenSharing && screenStream) { const v = document.getElementById('stream-me'); v.srcObject = screenStream; v.classList.add('active'); document.getElementById('placeholder-me').style.display = 'none'; } else if (localStream && (camEnabled || micEnabled)) { const v = document.getElementById('stream-me'); v.srcObject = localStream; if(camEnabled) v.classList.add('active'); document.getElementById('placeholder-me').style.display = 'none'; } }
+  }
+
+  let canvas, ctx, isDrawing = false, lastX = 0, lastY = 0;
+  window.toggleWhiteboard = (show) => {
+    const wb = $('whiteboardPanel');
+    if (show) {
+      wb.style.display = 'flex';
+      if (!ctx) {
+        canvas = $('whiteboardCanvas'); ctx = canvas.getContext('2d');
+        const resizeCanvas = () => { canvas.width = canvas.parentElement.clientWidth; canvas.height = canvas.parentElement.clientHeight - 50; };
+        resizeCanvas(); window.addEventListener('resize', resizeCanvas);
+        canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseup', stopDraw); canvas.addEventListener('mouseleave', stopDraw);
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDraw(e.touches[0]); }, {passive:false});
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); }, {passive:false});
+        canvas.addEventListener('touchend', stopDraw);
+      }
+    } else { wb.style.display = 'none'; }
+  };
+
+  function startDraw(e) { isDrawing = true; const rect = canvas.getBoundingClientRect(); lastX = e.clientX - rect.left; lastY = e.clientY - rect.top; }
+  function draw(e) { if (!isDrawing) return; const rect = canvas.getBoundingClientRect(); const x = e.clientX - rect.left, y = e.clientY - rect.top; drawSegment(lastX, lastY, x, y, true); lastX = x; lastY = y; }
+  function stopDraw() { isDrawing = false; }
+  
+  function drawSegment(x1, y1, x2, y2, emit) {
+    if (!ctx) return;
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); 
+    ctx.strokeStyle = '#000'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.stroke();
+    if (emit) sendSignalData({ type: 'board', boardType: 'draw', x1, y1, x2, y2 });
+  }
+  
+  window.clearBoard = () => { if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height); sendSignalData({ type: 'board', boardType: 'clear' }); };
+
+</script>
+</body>
+</html>
