@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Phoenix Messenger</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: Tahoma, sans-serif; }
+  body { background: #000; color: #fff; height: 100dvh; display: flex; justify-content: center; overflow: hidden; }
+  #app { width: 100%; max-width: 480px; height: 100dvh; background: #121212; display: flex; flex-direction: column; position: relative; }
+
+  .svg-icon { width: 20px; height: 20px; stroke: #aaa; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 100; stroke-dashoffset: 100; animation: drawSVG 2s ease-in-out forwards; }
+  .svg-icon.orange { stroke: #ff7b00; }
+  .svg-icon.white { stroke: #fff; }
+  @keyframes drawSVG { to { stroke-dashoffset: 0; } }
+
+  #connectionStatusBar { background: #ff7b00; color: #fff; font-size: 11px; text-align: center; padding: 4px; font-weight: bold; transition: background 0.3s; }
+  #connectionStatusBar.online { background: #0f0; color: #000; }
+  #connectionStatusBar.connecting { background: #ffa500; color: #000; }
+
+  .main-logo-header { display: flex; flex-direction: column; align-items: flex-end; padding: 10px 15px; background: transparent; }
+  .main-logo-header img { height: 40px; width: auto; object-fit: contain; }
+  .main-logo-header .logo-text { font-size: 14px; font-weight: bold; color: #ff7b00; margin-top: 5px; letter-spacing: 1px; }
+
+  #authPage { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 100; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; transition: transform 0.3s ease; }
+  #authPage.hidden { transform: translateY(100%); }
+  .auth-toggle { display: flex; justify-content: center; gap: 20px; margin-bottom: 20px; }
+  .auth-toggle span { cursor: pointer; padding: 8px 15px; border-radius: 20px; font-size: 14px; color: #888; transition: 0.2s; }
+  .auth-toggle span.active { background: #ff7b00; color: #fff; font-weight: bold; }
+  .avatar-upload-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
+  .avatar-preview { width: 90px; height: 90px; border-radius: 50%; background: #1e1e1e; border: 2px dashed #ff7b00; display: flex; justify-content: center; align-items: center; overflow: hidden; cursor: pointer; position: relative; }
+  .avatar-preview img { width: 100%; height: 100%; object-fit: cover; display: none; }
+  .avatar-preview span { font-size: 30px; color: #ff7b00; }
+  .upload-text { font-size: 11px; color: #888; margin-top: 8px; }
+  .form-group { margin-bottom: 15px; }
+  .form-group label { display: block; font-size: 13px; color: #ccc; margin-bottom: 8px; }
+  .form-control { width: 100%; background: #1e1e1e; border: 1px solid #333; color: #fff; padding: 12px 15px; border-radius: 12px; font-size: 14px; outline: none; }
+  .form-control:focus { border-color: #ff7b00; }
+  select.form-control { background-color: #1e1e1e; color: #ff7b00; font-weight: bold; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml;utf8,<svg fill='%23ff7b00' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>"); background-repeat: no-repeat; background-position: left 10px center; }
+  select.form-control option { color: #fff; background: #1e1e1e; }
+  .gender-group { display: flex; gap: 10px; }
+  .gender-btn { flex: 1; padding: 12px; background: #1e1e1e; border: 1px solid #333; border-radius: 12px; color: #aaa; cursor: pointer; text-align: center; font-size: 14px; transition: 0.2s; }
+  .gender-btn.active { background: #ff7b00; color: #fff; border-color: #ff7b00; font-weight: bold; }
+  .auth-btn { width: 100%; background: #ff7b00; color: #fff; border: none; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 15px rgba(255, 123, 0, 0.3); }
+  .error-text { color: #ff4444; font-size: 12px; margin-top: 10px; display: none; text-align: center; }
+
+  #mainApp { flex: 1; display: none; flex-direction: column; overflow: hidden; }
+  #mainApp.active { display: flex; }
+  .top-bar { background: #1e1e1e; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #333; min-height: 60px; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .header-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid #555; background: #333; }
+  .header-info { display: flex; flex-direction: column; }
+  .header-name { font-size: 14px; font-weight: bold; color: #fff; }
+  .header-id { font-size: 10px; color: #777; }
+  .header-actions { display: flex; gap: 15px; cursor: pointer; }
+  .back-btn { display: none; background: none; border: none; cursor: pointer; margin-left: 5px; }
+  
+  .bottom-nav { background: #1e1e1e; border-top: 1px solid #333; display: flex; justify-content: space-around; padding: 10px 0; height: 60px; }
+  .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #777; font-size: 11px; cursor: pointer; flex: 1; position: relative; transition: 0.2s; }
+  .nav-item.active { color: #ff7b00; }
+  .nav-item.active .svg-icon { stroke: #ff7b00; }
+  .nav-badge { position: absolute; top: 2px; right: 25%; background: #ff3b30; color: #fff; font-size: 10px; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; display: none; justify-content: center; align-items: center; border: 2px solid #1e1e1e; }
+  .nav-badge.show { display: flex; }
+
+  .page { flex: 1; display: none; flex-direction: column; overflow: hidden; position: relative; }
+  .page.active { display: flex; }
+
+  #pageRoomList { background: #121212; padding: 10px; overflow-y: auto; }
+  .room-list-title { font-size: 13px; color: #888; margin-bottom: 10px; text-align: center; }
+  .room-item { background: #1e1e1e; border: 1px solid #333; border-radius: 12px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
+  .room-item:hover { background: #2a2a2a; border-color: #ff7b00; }
+  .room-item-info { display: flex; flex-direction: column; gap: 5px; }
+  .room-item-name { font-weight: bold; font-size: 15px; color: #fff; }
+  .room-item-desc { font-size: 11px; color: #888; }
+  .room-item-arrow { display: flex; align-items: center; justify-content: center; }
+
+  #pagePublic { background: #f0f0f0; }
+  #publicChatMessages { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 15px; background-color: #f0f0f0; }
+  .mc-msg { display: flex; align-items: flex-start; gap: 10px; width: 100%; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #e0e0e0; animation: fadeIn 0.2s; }
+  .mc-msg-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; background: #ddd; flex-shrink: 0; position: relative; }
+  .mc-msg-content { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+  .mc-msg-header { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .mc-name { font-weight: bold; color: #555; }
+  .mc-time { font-size: 11px; color: #999; margin-right: auto; }
+  .mc-msg-body { font-size: 14px; color: #333; line-height: 1.5; }
+  
+  #pageUsers, #pageInbox { background: #121212; }
+  #usersList, #inboxList { flex: 1; overflow-y: auto; padding: 10px; }
+  .user-card { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid #2a2a2a; cursor: pointer; }
+  .user-card:hover { background: #1a1a1a; }
+  .uc-right { display: flex; align-items: center; gap: 12px; }
+  .uc-avatar-wrap { position: relative; }
+  .uc-avatar { width: 50px; height: 50px; border-radius: 16px; object-fit: cover; background: #333; }
+  .uc-online-dot { position: absolute; top: 0; right: 0; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #121212; }
+  .uc-online-dot.online { background: #4ade80; }
+  .uc-online-dot.offline { background: #777; }
+  .uc-info { display: flex; flex-direction: column; gap: 2px; }
+  .uc-name-row { display: flex; align-items: center; gap: 6px; }
+  .uc-name { font-weight: bold; font-size: 14px; color: #eee; }
+  .uc-id { font-size: 10px; color: #777; }
+  .uc-age { background: #3a1e2e; color: #ff6b8b; font-size: 11px; padding: 2px 6px; border-radius: 10px; }
+  .uc-details { font-size: 12px; color: #888; display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+  .uc-flag { width: 16px; height: 12px; border-radius: 2px; }
+  .uc-unread-badge { background: #ff3b30; color: #fff; font-size: 11px; font-weight: bold; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+  .uc-chat-icon { display: flex; justify-content: center; align-items: center; }
+
+  #privateChatPage { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #121212; z-index: 10; display: flex; flex-direction: column; transform: translateX(-100%); transition: transform 0.3s ease; }
+  #privateChatPage.active { transform: translateX(0); }
+  #privateMessages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+  .p-msg { display: flex; flex-direction: column; max-width: 85%; }
+  .p-msg.others { align-self: flex-start; }
+  .p-msg.me { align-self: flex-end; align-items: flex-end; }
+  .p-bubble { padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.5; word-break: break-word; }
+  .p-msg.others .p-bubble { background: #1e1e1e; color: #eee; border-bottom-right-radius: 4px; border: 1px solid #333; }
+  .p-msg.me .p-bubble { background: #ff7b00; color: #fff; border-bottom-left-radius: 4px; }
+
+  .chat-input-area { background: #1e1e1e; padding: 10px; border-top: 1px solid #333; display: flex; align-items: center; gap: 10px; width: 100%; }
+  .mic-btn { width: 45px; height: 45px; border-radius: 50%; background: #ff7b00; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; flex-shrink: 0; }
+  .input-wrap { flex: 1; background: #121212; border: 1px solid #444; border-radius: 25px; display: flex; align-items: center; padding: 5px 15px; }
+  .input-wrap input { flex: 1; background: transparent; border: none; color: #fff; outline: none; font-size: 14px; padding: 8px 5px; }
+  .attach-btn, .send-btn { background: none; border: none; cursor: pointer; padding: 5px; display: flex; justify-content: center; align-items: center; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div id="toastNotification" style="position: absolute; top: -100px; left: 50%; transform: translateX(-50%); transition: top 0.3s; z-index: 1000;">
+    <div style="background:#2a2a2a; color:white; padding:12px 20px; border-radius:12px; display:flex; align-items:center; gap:10px; border:1px solid #444; box-shadow:0 4px 15px rgba(0,0,0,0.5);">
+      <span id="toastTitle" style="font-weight:bold; color:#ff7b00; font-size:13px;">پیام جدید</span>
+      <span id="toastMsg" style="font-size:12px; color:#ccc;">سلام</span>
+    </div>
+  </div>
+
+  <div id="authPage">
+    <div class="main-logo-header">
+      <img src="https://s6.uupload.ir/files/inshot_20261109_024445769_5m4n.png" onerror="this.style.display='none'">
+      <div class="logo-text">Phoenix (ققنوس)</div>
+    </div>
+
+    <div class="auth-toggle">
+      <span id="tabLogin" class="active" onclick="switchAuthTab('login')">ورود</span>
+      <span id="tabRegister" onclick="switchAuthTab('register')">ثبت‌نام</span>
+    </div>
+
+    <div id="registerForm">
+      <div class="avatar-upload-container" onclick="document.getElementById('avatarInput').click()">
+        <div class="avatar-preview">
+          <img id="avatarImg" src="">
+          <svg id="avatarIcon" viewBox="0 0 24 24" class="svg-icon orange" style="width:35px; height:35px;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+        </div>
+        <div class="upload-text">برای انتخاب عکس کلیک کنید</div>
+        <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="previewAvatar(event)">
+      </div>
+      <div class="form-group"><label>نام مستعار</label><input type="text" id="regName" class="form-control" placeholder="مثلاً: آریسا"></div>
+      <div class="form-group"><label>رمز عبور</label><input type="password" id="regPass" class="form-control" placeholder="برای بازیابی اکانت"></div>
+      <div class="form-group"><label>استان</label>
+        <select id="regProvince" class="form-control">
+          <option value="" disabled selected>انتخاب استان...</option>
+          <option value="تهران">تهران</option><option value="البرز">البرز</option><option value="اصفهان">اصفهان</option><option value="خراسان رضوی">خراسان رضوی</option><option value="فارس">فارس</option><option value="آذربایجان شرقی">آذربایجان شرقی</option><option value="آذربایجان غربی">آذربایجان غربی</option><option value="خوزستان">خوزستان</option><option value="مازندران">مازندران</option><option value="گیلان">گیلان</option><option value="کرمان">کرمان</option><option value="سیستان و بلوچستان">سیستان و بلوچستان</option><option value="کرمانشاه">کرمانشاه</option><option value="گلستان">گلستان</option><option value="هرمزگان">هرمزگان</option><option value="همدان">همدان</option><option value="کردستان">کردستان</option><option value="مرکزی">مرکزی</option><option value="قزوین">قزوین</option><option value="قم">قم</option><option value="یزد">یزد</option><option value="زنجان">زنجان</option><option value="سمنان">سمنان</option><option value="چهارمحال و بختیاری">چهارمحال و بختیاری</option><option value="لرستان">لرستان</option><option value="بوشهر">بوشهر</option><option value="اردبیل">اردبیل</option><option value="ایلام">ایلام</option><option value="کهگیلویه و بویراحمد">کهگیلویه و بویراحمد</option><option value="خراسان شمالی">خراسان شمالی</option><option value="خراسان جنوبی">خراسان جنوبی</option>
+        </select>
+      </div>
+      <div class="form-group"><label>سن (بالای ۱۵ سال)</label><input type="number" id="regAge" class="form-control" placeholder="مثلاً: 18" min="15" max="99"></div>
+      <div class="form-group"><label>جنسیت</label>
+        <div class="gender-group">
+          <button type="button" class="gender-btn" id="btnMale" onclick="selectGender('مرد')">مرد هستم</button>
+          <button type="button" class="gender-btn" id="btnFemale" onclick="selectGender('زن')">زن هستم</button>
+        </div>
+      </div>
+      <div class="error-text" id="registerError"></div>
+      <button class="auth-btn" onclick="handleRegister()">ثبت‌نام و ورود</button>
+    </div>
+
+    <div id="loginForm" style="display: none;">
+      <div class="form-group"><label>نام مستعار</label><input type="text" id="loginName" class="form-control" placeholder="نام مستعار خود را وارد کنید"></div>
+      <div class="form-group"><label>رمز عبور</label><input type="password" id="loginPass" class="form-control" placeholder="رمز عبور"></div>
+      <div class="error-text" id="loginError"></div>
+      <button class="auth-btn" onclick="handleLogin()">ورود به حساب</button>
+    </div>
+  </div>
+
+  <div id="mainApp">
+    <div id="connectionStatusBar" class="connecting">در حال اتصال به سرور اصلی...</div>
+
+    <div id="pageRoomList" class="page active">
+      <div class="main-logo-header">
+        <img src="https://s6.uupload.ir/files/inshot_20261109_024445769_5m4n.png" onerror="this.style.display='none'">
+        <div class="logo-text">Phoenix (ققنوس)</div>
+      </div>
+      <div class="top-bar" style="border-bottom:none; justify-content:center; background:transparent; min-height:auto;">
+        <div style="font-weight:700; font-size:16px; color:#ff7b00;">لیست اتاق‌ها</div>
+        <div class="header-actions" style="position:absolute; left:15px;" onclick="logout()" title="خروج">
+          <svg viewBox="0 0 24 24" class="svg-icon"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        </div>
+      </div>
+      <div id="roomItemsContainer" class="room-list-title">یک اتاق را برای ورود انتخاب کنید</div>
+    </div>
+
+    <div id="pagePublic" class="page">
+      <div class="main-logo-header" style="padding: 5px 15px; background: #1e1e1e;">
+        <img src="https://s6.uupload.ir/files/inshot_20261109_024445769_5m4n.png" style="height:30px;" onerror="this.style.display='none'">
+        <div class="logo-text" style="font-size:10px;">Phoenix (ققنوس)</div>
+      </div>
+      
+      <div class="top-bar" style="border-bottom: 1px solid #333;">
+        <div class="header-right">
+          <button class="back-btn" onclick="goBackToRooms()" style="display:block;">
+            <svg viewBox="0 0 24 24" class="svg-icon orange"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          </button>
+          <div class="header-info"><div class="header-name" id="roomTitle">اتاق</div><div class="header-id" id="roomBrokerText">Phoenix Room</div></div>
+        </div>
+        <div class="header-actions">
+          <svg viewBox="0 0 24 24" class="svg-icon"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+          <svg viewBox="0 0 24 24" class="svg-icon"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+        </div>
+      </div>
+      <div id="publicChatMessages"></div>
+      <div class="chat-input-area">
+        <button class="mic-btn">
+          <svg viewBox="0 0 24 24" class="svg-icon white"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+        </button>
+        <div class="input-wrap">
+          <button class="attach-btn">
+            <svg viewBox="0 0 24 24" class="svg-icon"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+          </button>
+          <input type="text" id="publicInput" placeholder="Type here...">
+        </div>
+        <button class="send-btn" onclick="sendPublicMessage()">
+          <svg viewBox="0 0 24 24" class="svg-icon orange"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="pageUsers" class="page">
+      <div class="main-logo-header">
+        <img src="https://s6.uupload.ir/files/inshot_20261109_024445769_5m4n.png" onerror="this.style.display='none'">
+        <div class="logo-text">Phoenix (ققنوس)</div>
+      </div>
+      <div class="top-bar" style="border-bottom:none; justify-content:center; background:transparent; min-height:auto;">
+        <div style="font-weight:700; font-size:16px; color:#ff7b00;">افراد آنلاین (<span id="onlineCount">0</span>)</div>
+      </div>
+      <div id="usersList"></div>
+    </div>
+
+    <div id="pageInbox" class="page">
+      <div class="main-logo-header">
+        <img src="https://s6.uupload.ir/files/inshot_20261109_024445769_5m4n.png" onerror="this.style.display='none'">
+        <div class="logo-text">Phoenix (ققنوس)</div>
+      </div>
+      <div class="top-bar" style="border-bottom:none; justify-content:center; background:transparent; min-height:auto;">
+        <div style="font-weight:700; font-size:16px; color:#ff7b00;">پیام‌های خصوصی</div>
+      </div>
+      <div id="inboxList"></div>
+    </div>
+
+    <div id="privateChatPage">
+      <div class="main-logo-header" style="padding: 5px 15px; background: #1e1e1e;">
+        <img src="https://s6.uupload.ir/files/inshot_20261109_024445769_5m4n.png" style="height:30px;" onerror="this.style.display='none'">
+        <div class="logo-text" style="font-size:10px;">Phoenix (ققنوس)</div>
+      </div>
+      <div class="top-bar" style="border-bottom: 1px solid #333;">
+        <div class="header-right">
+          <button class="back-btn" onclick="closePrivateChat()" style="display:block;">
+            <svg viewBox="0 0 24 24" class="svg-icon orange"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          </button>
+          <img id="pcAvatar" src="" class="header-avatar">
+          <div class="header-info"><div class="header-name" id="pcName"></div><div class="header-id" id="pcId"></div><div class="header-status" id="pcStatus" style="font-size:11px; margin-top:2px;"></div></div>
+        </div>
+        <div class="header-actions">
+          <svg viewBox="0 0 24 24" class="svg-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+          <svg viewBox="0 0 24 24" class="svg-icon"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+        </div>
+      </div>
+      <div id="privateMessages"></div>
+      <div class="chat-input-area">
+        <button class="mic-btn">
+          <svg viewBox="0 0 24 24" class="svg-icon white"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+        </button>
+        <div class="input-wrap">
+          <button class="attach-btn">
+            <svg viewBox="0 0 24 24" class="svg-icon"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+          </button>
+          <input type="text" id="privateInput" placeholder="پیام خصوصی...">
+        </div>
+        <button class="send-btn" onclick="sendPrivateMessage()">
+          <svg viewBox="0 0 24 24" class="svg-icon orange"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item active" id="navRooms" onclick="switchTab('rooms')">
+        <svg viewBox="0 0 24 24" class="svg-icon"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        <span>روم‌ها</span>
+      </div>
+      <div class="nav-item" id="navUsers" onclick="switchTab('users')">
+        <svg viewBox="0 0 24 24" class="svg-icon"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        <span>کاربران</span>
+      </div>
+      <div class="nav-item" id="navInbox" onclick="switchTab('inbox')">
+        <svg viewBox="0 0 24 24" class="svg-icon"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
+        <span>پیام‌ها</span>
+        <div class="nav-badge" id="inboxNavBadge">0</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<script>
+  // ==========================================
+  // فقط یک سرور اصلی! بقیه فقط در صورت خرابی اصلی
+  // ==========================================
+  const BROKERS = [
+    'wss://broker.emqx.io:8084/mqtt',      // سرور اصلی (همه باید اینجا باشند)
+    'wss://broker-cn.emqx.io:8084/mqtt',   // سرور پشتیبان ۱
+    'wss://test.mosquitto.org:8081/mqtt',  // سرور پشتیبان ۲
+    'wss://broker.hivemq.com:8884/mqtt'    // سرور پشتیبان ۳
+  ];
+
+  let currentBrokerIndex = 0;
+  const TOPIC_ALL_USERS = 'phoenix_all_users_v35';
+  const TOPIC_PRIVATE   = 'phoenix_private_v35';
+
+  const ROOMS = [
+    { id: 'iran',       name: 'روم ایران (اصلی)', desc: 'گفتگوی آزاد ملی',       topic: 'phoenix_room_iran_v35' },
+    { id: 'youth',      name: 'روم جوانان',       desc: 'ویژه ۱۵ تا ۲۵ سال',      topic: 'phoenix_room_youth_v35' },
+    { id: 'adults',     name: 'روم بزرگسالان',    desc: 'ویژه بالای ۲۵ سال',      topic: 'phoenix_room_adults_v35' },
+    { id: 'tehran',     name: 'روم تهران',        desc: 'پایتخت',               topic: 'phoenix_room_tehran_v35' },
+    { id: 'khorasan',   name: 'روم خراسان رضوی',  desc: 'مشهد',                 topic: 'phoenix_room_khorasan_v35' },
+    { id: 'isfahan',    name: 'روم اصفهان',       desc: 'نصف جهان',             topic: 'phoenix_room_isfahan_v35' },
+    { id: 'fars',       name: 'روم فارس',         desc: 'شیراز',                 topic: 'phoenix_room_fars_v35' },
+    { id: 'azarbaijan', name: 'روم آذربایجان شرقی', desc: 'تبریز',              topic: 'phoenix_room_azarbaijan_v35' },
+    { id: 'khuzestan',  name: 'روم خوزستان',      desc: 'اهواز',                topic: 'phoenix_room_khuzestan_v35' },
+    { id: 'alborz',     name: 'روم البرز',        desc: 'کرج',                   topic: 'phoenix_room_alborz_v35' },
+    { id: 'kerman',     name: 'روم کرمان',        desc: 'کرمان',                topic: 'phoenix_room_kerman_v35' }
+  ];
+
+  let myUser = { id: '', name: '', password: '', age: 0, province: '', gender: '', avatar: '' };
+  let selectedGender = '';
+  let avatarBase64 = null;
+
+  let mainClient = null;
+  let currentRoomIndex = -1;
+  let onlineUsers = new Map();
+  let currentPrivateUser = null;
+  let unreadCounts = {};
+  let chatHistory = {};
+  let presenceInterval = null;
+  let uiUpdateInterval = null;
+  let reconnectAttempts = 0;
+
+  const PRESENCE_INTERVAL = 7000; // زمان ارسال سیگنال حضور
+  const ONLINE_TIMEOUT    = 20000; // آفلاین شدن
+  const REMOVE_TIMEOUT    = 40000; // حذف از لیست
+
+  // ============ توابع کمکی ============
+  function setConnectionStatus(text, statusClass) {
+    const bar = document.getElementById('connectionStatusBar');
+    bar.textContent = text;
+    bar.className = statusClass;
+  }
+
+  function playNotificationSound() {
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      const ctx = new AudioContext();
+      const osc1 = ctx.createOscillator(); const gain1 = ctx.createGain();
+      osc1.type = 'sine'; osc1.frequency.setValueAtTime(880, ctx.currentTime);
+      gain1.gain.setValueAtTime(0.1, ctx.currentTime); gain1.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+      osc1.connect(gain1); gain1.connect(ctx.destination); osc1.start(); osc1.stop(ctx.currentTime + 0.1);
+      const osc2 = ctx.createOscillator(); const gain2 = ctx.createGain();
+      osc2.type = 'sine'; osc2.frequency.setValueAtTime(1320, ctx.currentTime + 0.15);
+      gain2.gain.setValueAtTime(0.1, ctx.currentTime + 0.15); gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+      osc2.connect(gain2); gain2.connect(ctx.destination); osc2.start(ctx.currentTime + 0.15); osc2.stop(ctx.currentTime + 0.3);
+    } catch(e) {}
+  }
+
+  function showToast(title, msg) {
+    const toast = document.getElementById('toastNotification');
+    document.getElementById('toastTitle').textContent = title;
+    document.getElementById('toastMsg').textContent = msg;
+    toast.style.top = '10px';
+    playNotificationSound();
+    setTimeout(() => { toast.style.top = '-100px'; }, 4000);
+  }
+
+  // ============ Auth ============
+  window.switchAuthTab = function(tab) {
+    document.getElementById('tabLogin').classList.remove('active');
+    document.getElementById('tabRegister').classList.remove('active');
+    document.getElementById('registerForm').style.display = 'none';
+    document.getElementById('loginForm').style.display = 'none';
+    if (tab === 'login') {
+      document.getElementById('tabLogin').classList.add('active');
+      document.getElementById('loginForm').style.display = 'block';
+    } else {
+      document.getElementById('tabRegister').classList.add('active');
+      document.getElementById('registerForm').style.display = 'block';
+    }
+  }
+
+  window.previewAvatar = function(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        avatarBase64 = e.target.result;
+        document.getElementById('avatarImg').src = avatarBase64;
+        document.getElementById('avatarImg').style.display = 'block';
+        document.getElementById('avatarIcon').style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  window.selectGender = function(gender) {
+    selectedGender = gender;
+    document.getElementById('btnMale').classList.remove('active');
+    document.getElementById('btnFemale').classList.remove('active');
+    if (gender === 'مرد') document.getElementById('btnMale').classList.add('active');
+    if (gender === 'زن') document.getElementById('btnFemale').classList.add('active');
+  }
+
+  window.handleRegister = function() {
+    const name = document.getElementById('regName').value.trim();
+    const pass = document.getElementById('regPass').value.trim();
+    const province = document.getElementById('regProvince').value;
+    const age = parseInt(document.getElementById('regAge').value);
+    const errorEl = document.getElementById('registerError');
+    errorEl.style.display = 'none';
+
+    if (!name) { errorEl.textContent = 'لطفاً نام مستعار را وارد کنید'; errorEl.style.display = 'block'; return; }
+    if (!pass) { errorEl.textContent = 'لطفاً رمز عبور را وارد کنید'; errorEl.style.display = 'block'; return; }
+    if (!province) { errorEl.textContent = 'لطفاً استان را انتخاب کنید'; errorEl.style.display = 'block'; return; }
+    if (!age || age < 15) { errorEl.textContent = 'ورود برای افراد زیر ۱۵ سال مجاز نیست'; errorEl.style.display = 'block'; return; }
+    if (!selectedGender) { errorEl.textContent = 'لطفاً جنسیت را انتخاب کنید'; errorEl.style.display = 'block'; return; }
+
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    const newUser = {
+      id: `Phoenix_${randomNum}`, name: name, password: pass, age: age, province: province, gender: selectedGender,
+      avatar: avatarBase64 || `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23${Math.floor(Math.random()*0xFFFFFF).toString(16).padStart(6,'0')}'/><text x='50' y='55' font-size='40' text-anchor='middle' fill='%23fff' font-family='Tahoma'>${name.charAt(0)}</text></svg>`
+    };
+    localStorage.setItem('phoenixUser', JSON.stringify(newUser));
+    loginUser(newUser);
+  }
+
+  window.handleLogin = function() {
+    const name = document.getElementById('loginName').value.trim();
+    const pass = document.getElementById('loginPass').value.trim();
+    const errorEl = document.getElementById('loginError');
+    errorEl.style.display = 'none';
+
+    const storedData = localStorage.getItem('phoenixUser');
+    if (!storedData) {
+      errorEl.textContent = 'هیچ اکانتی یافت نشد. لطفاً ثبت‌نام کنید.';
+      errorEl.style.display = 'block';
+      return;
+    }
+    const storedUser = JSON.parse(storedData);
+    if (storedUser.name !== name || storedUser.password !== pass) {
+      errorEl.textContent = 'نام مستعار یا رمز عبور اشتباه است.';
+      errorEl.style.display = 'block';
+      return;
+    }
+    loginUser(storedUser);
+  }
+
+  function loginUser(user) {
+    myUser = user;
+    document.getElementById('authPage').classList.add('hidden');
+    document.getElementById('mainApp').classList.add('active');
+    renderRoomList();
+    
+    // همیشه از سرور اول شروع میکنیم
+    currentBrokerIndex = 0; 
+    reconnectAttempts = 0;
+    connectBroker();
+
+    if (uiUpdateInterval) clearInterval(uiUpdateInterval);
+    uiUpdateInterval = setInterval(() => {
+      checkOfflineUsers();
+      if (document.getElementById('pageUsers').classList.contains('active')) renderUsers();
+    }, 3000);
+  }
+
+  window.logout = function() {
+    if (!confirm('آیا مطمئن هستید که می‌خواهید خارج شوید؟')) return;
+    if (mainClient) { try { mainClient.end(true); } catch(e){} mainClient = null; }
+    if (presenceInterval) clearInterval(presenceInterval);
+    if (uiUpdateInterval) clearInterval(uiUpdateInterval);
+    onlineUsers.clear();
+    document.getElementById('mainApp').classList.remove('active');
+    document.getElementById('authPage').classList.remove('hidden');
+    setConnectionStatus('در حال اتصال...', 'connecting');
+    const storedData = localStorage.getItem('phoenixUser');
+    if(storedData) {
+      const storedUser = JSON.parse(storedData);
+      document.getElementById('loginName').value = storedUser.name;
+      switchAuthTab('login');
+    }
+  }
+
+  window.onload = function() {
+    const storedData = localStorage.getItem('phoenixUser');
+    if (storedData) {
+      try { loginUser(JSON.parse(storedData)); } catch(e) {}
+    }
+  };
+
+  // ============ Rooms ============
+  function renderRoomList() {
+    const container = document.getElementById('roomItemsContainer');
+    container.innerHTML = '<div class="room-list-title">یک اتاق را برای ورود انتخاب کنید</div>';
+    ROOMS.forEach((room, index) => {
+      const div = document.createElement('div');
+      div.className = 'room-item';
+      div.innerHTML = `
+        <div class="room-item-info">
+          <div class="room-item-name">${room.name}</div>
+          <div class="room-item-desc">${room.desc}</div>
+        </div>
+        <div class="room-item-arrow">
+          <svg viewBox="0 0 24 24" class="svg-icon orange"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </div>`;
+      div.onclick = () => enterRoom(index);
+      container.appendChild(div);
+    });
+  }
+
+  window.enterRoom = function(index) {
+    if (currentRoomIndex >= 0 && mainClient && mainClient.connected) {
+      mainClient.unsubscribe(ROOMS[currentRoomIndex].topic);
+    }
+    currentRoomIndex = index;
+    document.getElementById('roomTitle').textContent = ROOMS[index].name;
+    document.getElementById('roomBrokerText').textContent = ROOMS[index].desc;
+    document.getElementById('publicChatMessages').innerHTML = '';
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('pagePublic').classList.add('active');
+    if (mainClient && mainClient.connected) {
+      mainClient.subscribe(ROOMS[index].topic, { qos: 0 });
+    }
+  }
+
+  window.goBackToRooms = function() {
+    if (currentRoomIndex >= 0 && mainClient && mainClient.connected) {
+      mainClient.unsubscribe(ROOMS[currentRoomIndex].topic);
+    }
+    currentRoomIndex = -1;
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('pageRoomList').classList.add('active');
+  }
+
+  function renderPublicMessage(text, name, avatar, isMe = false) {
+    const el = document.getElementById('publicChatMessages');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'mc-msg';
+    const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const safeName = (name || '').replace(/[<>]/g, '');
+    msgDiv.innerHTML = `
+      <img src="${avatar}" class="mc-msg-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%23333%22/><text x=%2250%22 y=%2255%22 font-size=%2240%22 text-anchor=%22middle%22 fill=%22%23fff%22>${safeName.charAt(0)}</text></svg>'">
+      <div class="mc-msg-content">
+        <div class="mc-msg-header">
+          <span class="mc-name">${isMe ? 'شما' : safeName}</span>
+          <span class="mc-time">${time}</span>
+        </div>
+        <div class="mc-msg-body"></div>
+      </div>`;
+    msgDiv.querySelector('.mc-msg-body').textContent = text;
+    el.appendChild(msgDiv);
+    el.scrollTop = el.scrollHeight;
+  }
+
+  window.sendPublicMessage = function() {
+    if (currentRoomIndex < 0) return;
+    const input = document.getElementById('publicInput');
+    const text = input.value.trim();
+    if (!text) return;
+    renderPublicMessage(text, myUser.name, myUser.avatar, true);
+    if (mainClient && mainClient.connected) {
+      mainClient.publish(ROOMS[currentRoomIndex].topic, JSON.stringify({
+        id: myUser.id, name: myUser.name, avatar: myUser.avatar, text: text
+      }), { qos: 0 });
+    } else {
+      showToast('⚠️ خطا', 'اتصال برقرار نیست، پیام ارسال نشد');
+    }
+    input.value = '';
+  }
+  document.getElementById('publicInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendPublicMessage(); });
+
+  window.switchTab = function(tab) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if (tab === 'rooms') {
+      document.getElementById('pageRoomList').classList.add('active');
+      document.getElementById('navRooms').classList.add('active');
+    } else if (tab === 'users') {
+      document.getElementById('pageUsers').classList.add('active');
+      document.getElementById('navUsers').classList.add('active');
+      renderUsers();
+    } else if (tab === 'inbox') {
+      document.getElementById('pageInbox').classList.add('active');
+      document.getElementById('navInbox').classList.add('active');
+      renderInbox();
+    }
+  }
+
+  function updateInboxBadge() {
+    let total = 0;
+    for (const id in unreadCounts) total += unreadCounts[id];
+    const badge = document.getElementById('inboxNavBadge');
+    if (total > 0) { badge.textContent = total > 9 ? '+9' : total; badge.classList.add('show'); }
+    else badge.classList.remove('show');
+  }
+
+  // ============ Users ============
+  function renderUsers() {
+    const usersListEl = document.getElementById('usersList');
+    usersListEl.innerHTML = '';
+
+    const meCard = document.createElement('div');
+    meCard.className = 'user-card';
+    meCard.innerHTML = `
+      <div class="uc-right">
+        <div class="uc-avatar-wrap"><img src="${myUser.avatar}" class="uc-avatar" onerror="this.style.background='#333'"><div class="uc-online-dot online"></div></div>
+        <div class="uc-info">
+          <div class="uc-name-row"><span class="uc-age">${myUser.age}</span><span class="uc-name">${myUser.name} (شما)</span></div>
+          <div class="uc-id">${myUser.id}</div>
+          <div class="uc-details"><img src="https://flagcdn.com/w20/ir.png" class="uc-flag" onerror="this.style.display='none'"> ${myUser.province} • ${myUser.gender}</div>
+        </div>
+      </div>
+      <div style="color:#4ade80; font-size:12px; font-weight:bold;">آنلاین</div>`;
+    usersListEl.appendChild(meCard);
+
+    const sortedUsers = Array.from(onlineUsers.entries()).sort((a, b) => b[1].lastSeen - a[1].lastSeen);
+
+    for (const [id, data] of sortedUsers) {
+      if (id === myUser.id) continue;
+      const isOnline = (Date.now() - data.lastSeen < ONLINE_TIMEOUT);
+      const card = document.createElement('div');
+      card.className = 'user-card';
+      card.innerHTML = `
+        <div class="uc-right">
+          <div class="uc-avatar-wrap"><img src="${data.avatar}" class="uc-avatar" onerror="this.style.background='#333'"><div class="uc-online-dot ${isOnline ? 'online' : 'offline'}"></div></div>
+          <div class="uc-info">
+            <div class="uc-name-row"><span class="uc-age">${data.age || '?'}</span><span class="uc-name">${data.name || id}</span></div>
+            <div class="uc-id">${id}</div>
+            <div class="uc-details"><img src="https://flagcdn.com/w20/ir.png" class="uc-flag" onerror="this.style.display='none'"> ${data.province || '?'} • ${data.gender || '?'} ${!isOnline ? '<span style="color:#ff4444; font-size:10px; font-weight:bold;">(آفلاین)</span>' : ''}</div>
+          </div>
+        </div>
+        ${unreadCounts[id] ? `<div class="uc-unread-badge">${unreadCounts[id]}</div>` : `<div class="uc-chat-icon"><svg viewBox="0 0 24 24" class="svg-icon ${isOnline ? 'orange' : ''}"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>`}
+      `;
+      card.onclick = () => openPrivateChat(id);
+      usersListEl.appendChild(card);
+    }
+
+    let onlineCount = 1;
+    for (const [id, data] of onlineUsers.entries()) {
+      if (id !== myUser.id && (Date.now() - data.lastSeen < ONLINE_TIMEOUT)) onlineCount++;
+    }
+    document.getElementById('onlineCount').textContent = onlineCount;
+  }
+
+  // ============ Inbox ============
+  function renderInbox() {
+    const inboxListEl = document.getElementById('inboxList');
+    inboxListEl.innerHTML = '';
+    let hasMessages = false;
+    for (const id in chatHistory) {
+      if (chatHistory[id].length === 0) continue;
+      hasMessages = true;
+      const user = onlineUsers.get(id) || { name: id, avatar: myUser.avatar, lastSeen: 0 };
+      const lastMsg = chatHistory[id][chatHistory[id].length - 1];
+      const unread = unreadCounts[id] || 0;
+      const isOnline = (Date.now() - (user.lastSeen || 0) < ONLINE_TIMEOUT);
+
+      const card = document.createElement('div');
+      card.className = 'user-card';
+      card.innerHTML = `
+        <div class="uc-right">
+          <div class="uc-avatar-wrap"><img src="${user.avatar}" class="uc-avatar" onerror="this.style.background='#333'"><div class="uc-online-dot ${isOnline ? 'online' : 'offline'}"></div></div>
+          <div class="uc-info">
+            <div class="uc-name-row"><span class="uc-name">${user.name}</span></div>
+            <div class="uc-id">${id}</div>
+            <div class="uc-details" style="color:${unread > 0 ? '#ff7b00' : '#888'}; font-weight:${unread > 0 ? 'bold' : 'normal'}; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              ${lastMsg.isMe ? 'شما: ' : ''}${lastMsg.text}
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:5px;">
+          <span style="font-size:10px; color:#777;">${lastMsg.time}</span>
+          ${unread > 0 ? `<div class="uc-unread-badge">${unread}</div>` : ''}
+        </div>
+      `;
+      card.onclick = () => openPrivateChat(id);
+      inboxListEl.appendChild(card);
+    }
+    if (!hasMessages) {
+      const hint = document.createElement('div');
+      hint.style.cssText = "text-align:center; color:#555; font-size:13px; margin-top:30px;";
+      hint.innerHTML = "هیچ پیام خصوصی ندارید.<br>از تب کاربران شروع کنید!";
+      inboxListEl.appendChild(hint);
+    }
+  }
+
+  window.openPrivateChat = function(userId) {
+    currentPrivateUser = userId;
+    const user = onlineUsers.get(userId) || { name: userId, avatar: myUser.avatar, lastSeen: 0 };
+    document.getElementById('pcName').textContent = user.name;
+    document.getElementById('pcId').textContent = userId;
+    const pcAvatar = document.getElementById('pcAvatar');
+    pcAvatar.src = user.avatar;
+    pcAvatar.onerror = function() { this.style.background = '#333'; };
+
+    const isOnline = Date.now() - (user.lastSeen || 0) < ONLINE_TIMEOUT;
+    const pcStatus = document.getElementById('pcStatus');
+    pcStatus.textContent = isOnline ? 'آنلاین' : 'آفلاین';
+    pcStatus.style.color = isOnline ? '#4ade80' : '#777';
+
+    delete unreadCounts[userId];
+    updateInboxBadge();
+
+    const privateMsgsEl = document.getElementById('privateMessages');
+    privateMsgsEl.innerHTML = '';
+    if (chatHistory[userId] && chatHistory[userId].length > 0) {
+      chatHistory[userId].forEach(msg => addPrivateMsgToUI(msg.text, msg.isMe, msg.time));
+    } else {
+      privateMsgsEl.innerHTML = `<div style="text-align:center; color:#555; font-size:12px; margin-top:20px;">شما در حال چت خصوصی با ${user.name} هستید</div>`;
+    }
+    document.getElementById('privateChatPage').classList.add('active');
+    setTimeout(() => document.getElementById('privateInput').focus(), 300);
+  }
+
+  window.closePrivateChat = function() {
+    document.getElementById('privateChatPage').classList.remove('active');
+    currentPrivateUser = null;
+  }
+
+  function addPrivateMsgToUI(text, isMe, time) {
+    const privateMsgsEl = document.getElementById('privateMessages');
+    const div = document.createElement('div');
+    div.className = `p-msg ${isMe ? 'me' : 'others'}`;
+    const bubble = document.createElement('div');
+    bubble.className = 'p-bubble';
+    bubble.textContent = text;
+    div.appendChild(bubble);
+    if (time) {
+      const timeSpan = document.createElement('span');
+      timeSpan.style.cssText = 'font-size:10px; color:#777; margin-top:4px;';
+      timeSpan.textContent = time;
+      div.appendChild(timeSpan);
+    }
+    privateMsgsEl.appendChild(div);
+    privateMsgsEl.scrollTop = privateMsgsEl.scrollHeight;
+  }
+
+  window.sendPrivateMessage = function() {
+    if (!currentPrivateUser) return;
+    const input = document.getElementById('privateInput');
+    const text = input.value.trim();
+    if (!text) return;
+    const time = new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+    addPrivateMsgToUI(text, true, time);
+    if (!chatHistory[currentPrivateUser]) chatHistory[currentPrivateUser] = [];
+    chatHistory[currentPrivateUser].push({ text, isMe: true, time });
+    if (mainClient && mainClient.connected) {
+      mainClient.publish(TOPIC_PRIVATE, JSON.stringify({
+        from: myUser.id, fromName: myUser.name, fromAvatar: myUser.avatar,
+        to: currentPrivateUser, text: text, time: time
+      }), { qos: 0 });
+    } else {
+      showToast('⚠️ خطا', 'اتصال برقرار نیست');
+    }
+    input.value = '';
+  }
+  document.getElementById('privateInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendPrivateMessage(); });
+
+  // ============ Presence ============
+  function announcePresence() {
+    if (!mainClient || !mainClient.connected) return;
+    try {
+      mainClient.publish(TOPIC_ALL_USERS, JSON.stringify({
+        id: myUser.id, name: myUser.name, age: myUser.age,
+        province: myUser.province, gender: myUser.gender,
+        avatar: myUser.avatar, ts: Date.now()
+      }), { qos: 0 });
+    } catch(e) {}
+  }
+
+  // ============ MQTT ============
+  function connectBroker() {
+    if (typeof mqtt === 'undefined') {
+      setConnectionStatus('خطا: MQTT بارگذاری نشد', 'connecting');
+      return;
+    }
+
+    if (currentBrokerIndex >= BROKERS.length) currentBrokerIndex = 0;
+    const brokerUrl = BROKERS[currentBrokerIndex];
+    setConnectionStatus('در حال اتصال به سرور ' + (currentBrokerIndex + 1) + '/' + BROKERS.length + '...', 'connecting');
+
+    // ساخت یک Client ID کاملا تصادفی برای جلوگیری از قطعی ناشی از تکرار
+    const clientId = 'phx_' + Math.random().toString(16).slice(2, 10) + '_' + Date.now().toString(36);
+
+    if (mainClient) {
+      try { mainClient.removeAllListeners(); mainClient.end(true); } catch(e){}
+      mainClient = null;
+    }
+
+    try {
+      mainClient = mqtt.connect(brokerUrl, {
+        clientId: clientId,
+        clean: true,
+        connectTimeout: 10000,   // 10 ثانیه فرصت برای اتصال
+        reconnectPeriod: 0,      // غیرفعال کردن اتصال خودکار برای اینکه خودمان مدیریت کنیم
+        keepalive: 30
+      });
+    } catch (e) {
+      currentBrokerIndex++;
+      setTimeout(connectBroker, 2000);
+      return;
+    }
+
+    // اگر تا 10 ثانیه وصل نشد، برو سراغ سرور بعدی
+    const connectionTimeout = setTimeout(() => {
+      if (mainClient && !mainClient.connected) {
+        try { mainClient.end(true); } catch(e){}
+        currentBrokerIndex++;
+        connectBroker();
+      }
+    }, 10000);
+
+    mainClient.on('connect', () => {
+      clearTimeout(connectionTimeout);
+      reconnectAttempts = 0;
+      setConnectionStatus('✅ متصل (سرور ' + (currentBrokerIndex + 1) + ')', 'online');
+
+      // سابسکرایب کردن به تاپیک‌ها
+      mainClient.subscribe(TOPIC_ALL_USERS, { qos: 0 });
+      mainClient.subscribe(TOPIC_PRIVATE, { qos: 0 });
+      if (currentRoomIndex >= 0) {
+        mainClient.subscribe(ROOMS[currentRoomIndex].topic, { qos: 0 });
+      }
+
+      // سیگنال حضور را فورا و چند بار بفرست تا بقیه ما را ببینند
+      announcePresence();
+      setTimeout(announcePresence, 1000);
+      setTimeout(announcePresence, 3000);
+
+      if (presenceInterval) clearInterval(presenceInterval);
+      presenceInterval = setInterval(announcePresence, PRESENCE_INTERVAL);
+    });
+
+    mainClient.on('close', () => {
+      setConnectionStatus('قطع شد، تلاش مجدد...', 'connecting');
+      reconnectAttempts++;
+      // اگر 3 بار پشت سر هم قطع شد، برو سراغ سرور بعدی
+      if (reconnectAttempts >= 3) {
+        currentBrokerIndex++;
+        reconnectAttempts = 0;
+      }
+      setTimeout(connectBroker, 2000);
+    });
+
+    mainClient.on('error', (err) => {
+      console.warn('MQTT Error:', err && err.message);
+      // در صورت خطا، اجازه بده تا تایم اوت پیش برود یا Close فراخوانی شود
+    });
+
+    mainClient.on('message', (topic, payload) => {
+      try {
+        const data = JSON.parse(payload.toString());
+
+        if (topic === TOPIC_ALL_USERS) {
+          if (data.id && data.id !== myUser.id) {
+            onlineUsers.set(data.id, { ...data, lastSeen: Date.now() });
+            if (document.getElementById('pageUsers').classList.contains('active')) renderUsers();
+          }
+        }
+        else if (topic === TOPIC_PRIVATE) {
+          if (data.to === myUser.id) {
+            const time = data.time || new Date().toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+            if (!onlineUsers.has(data.from)) {
+              onlineUsers.set(data.from, {
+                id: data.from, name: data.fromName, avatar: data.fromAvatar,
+                age: '?', province: '?', gender: '?', lastSeen: Date.now()
+              });
+            } else {
+              const u = onlineUsers.get(data.from);
+              u.lastSeen = Date.now();
+            }
+            if (!chatHistory[data.from]) chatHistory[data.from] = [];
+            chatHistory[data.from].push({ text: data.text, isMe: false, time });
+
+            if (currentPrivateUser === data.from && document.getElementById('privateChatPage').classList.contains('active')) {
+              addPrivateMsgToUI(data.text, false, time);
+            } else {
+              unreadCounts[data.from] = (unreadCounts[data.from] || 0) + 1;
+              updateInboxBadge();
+              showToast(`پیام جدید از ${data.fromName}`, data.text);
+            }
+            if (document.getElementById('pageUsers').classList.contains('active')) renderUsers();
+            if (document.getElementById('pageInbox').classList.contains('active')) renderInbox();
+          }
+        }
+        else {
+          if (currentRoomIndex >= 0 && topic === ROOMS[currentRoomIndex].topic) {
+            if (data.id !== myUser.id) renderPublicMessage(data.text, data.name, data.avatar, false);
+          }
+        }
+      } catch (e) {}
+    });
+  }
+
+  function checkOfflineUsers() {
+    const now = Date.now();
+    let changed = false;
+    for (const [id, data] of onlineUsers.entries()) {
+      if (now - data.lastSeen > REMOVE_TIMEOUT) {
+        onlineUsers.delete(id);
+        changed = true;
+      }
+    }
+    if (changed && document.getElementById('pageUsers').classList.contains('active')) renderUsers();
+  }
+</script>
+</body>
+</html>
